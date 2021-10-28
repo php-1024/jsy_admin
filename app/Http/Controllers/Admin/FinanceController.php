@@ -1,0 +1,284 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Exceptions\ErrorCode;
+use App\Http\Requests\Admin\CurrencyOrderConfirm;
+use App\Http\Requests\Admin\Id;
+use App\Http\Requests\Admin\WithdrawOrderConfirm;
+use App\Library\Response;
+use App\Models\AdminOperationLog;
+use App\Models\CurrencyTransaction;
+use App\Models\OptionContractTransaction;
+use App\Models\PerpetualContractTransaction;
+use App\Models\Recharge;
+use App\Models\UsersWallet;
+use App\Models\WalletStream;
+use App\Models\Withdraw;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
+
+class FinanceController extends Controller
+{
+    /**
+     * 钱包流水
+     */
+    public function wallet_stream(Request $request): array
+    {
+        $limit       = $request->get('limit', 10);
+        $email       = $request->get('email'); // 用户邮箱
+        $way         = $request->get('way'); // 流转方式 1 收入 2 支出
+        $type        = $request->get('type'); // 流转类型 1 币币交易 2 永续合约 3 期权合约 4 申购交易 5 划转 6 充值 7 提现 8 冻结
+        $type_detail = $request->get('type_detail'); // 流转详细类型 1 USDT充值 2 银行卡充值 3 币币交易手续费 4 永续合约手续费 5 期权合约手续费 6 币币账户划转到合约账户 7 合约账户划转到币币账户 8 申购冻结 9 币币交易 10 永续合约 11 期权合约
+        $where       = [];
+        if (strlen($email)) {
+            $where['email'] = $email;
+        }
+        if (strlen($way)) {
+            $where['way'] = $way;
+        }
+        if (strlen($type)) {
+            $where['type'] = $type;
+        }
+        if (strlen($type_detail)) {
+            $where['type_detail'] = $type_detail;
+        }
+        $list = WalletStream::getPaginate($where, [], $limit, 'id', 'desc');
+        return Response::success($list);
+    }
+
+    /**
+     * 提现订单列表
+     * @param Request $request
+     * @return array
+     */
+    public function withdraw_order_list(Request $request): array
+    {
+        $email = $request->get('email');
+        $limit = $request->get('limit', 10);
+        $where = [];
+        if ($email) {
+            $where['email'] = $email;
+        }
+        $list = Withdraw::getPaginate($where, [], $limit);
+        foreach ($list as $key => $val) {
+            if ($val['handling_fee']) {
+                $list[$key]['handling_fee'] = $val['handling_fee'] . "%";
+            }
+        }
+        return Response::success($list);
+    }
+
+    /**
+     * 提现订单确认
+     * @param WithdrawOrderConfirm $request
+     * @return array
+     * @throws \Throwable
+     */
+    public function withdraw_order_confirm(WithdrawOrderConfirm $request): array
+    {
+        $id     = $request->get('id');
+        $status = $request->get('status');
+        DB::beginTransaction();
+        try {
+            $check = Withdraw::getOne(['id' => $id]);
+            if ($check == false) {
+                return Response::error([], ErrorCode::MLG_Error, "数据不存在！");
+            }
+            if (0 == $check['status'] && 1 == $status) {// 状态为零的数据审核通过
+                // 修改钱包余额
+                $UsersWallet = UsersWallet::getOne(['user_id' => $check['user_id'], 'trading_pair_id' => $check['trading_pair_id']]);
+                // 提现后的余额 = 对应钱包可用余额 + 提现金额
+                $available = $UsersWallet['available'] - $check['withdraw_num'];
+                if ($available < 0) {
+                    return Response::error([], ErrorCode::MLG_Error, '钱包余额不足！');
+                }
+                UsersWallet::EditData(['id' => $UsersWallet['id']], ['available' => $available]);
+                // 记录钱包流水
+                WalletStream::AddData([
+                    'trading_pair_id'   => $check['trading_pair_id'],     // 交易对ID
+                    'trading_pair_name' => $check['trading_pair_name'],  // 交易对名称
+                    'user_id'           => $check['user_id'],   // 用户id
+                    'email'             => $check['email'], // 用户邮箱
+                    'amount'            => $check['withdraw_num'],  // 流转金额
+                    'amount_before'     => $UsersWallet['available'],  // 流转前的余额
+                    'amount_after'      => $available,      // 流转后的余额
+                    'way'               => '2', // 流转方式 1 收入 2 支出
+                    'type'              => '7', // 流转类型 1 币币交易 2 永续合约 3 期权合约 4 申购交易 5 划转 6 充值 7 提现 8 冻结
+                    'type_detail'       => '0', // 流转详细类型  0 提现 1 USDT充值  2 银行卡充值  3 币币交易手续费  4 永续合约手续费  5 期权合约手续费  6 币币账户划转到合约账户  7 合约账户划转到币币账户  8 申购冻结  9 币币交易  10 永续合约  11 期权合约
+                ]);
+                $Withdraw = Withdraw::EditData(['id' => $id], ['status' => (string)$status]);
+                if ($Withdraw) {
+                    AdminOperationLog::Info($request, "确认了，id为{$Withdraw['id']}，的提现状态为：{$status}");
+                }
+            }
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            AdminOperationLog::Info($request, "确认提现状态失败", $e->getMessage());
+            return Response::error([], ErrorCode::MLG_Error, $e->getMessage());
+        }
+        return Response::success();
+    }
+
+    /**
+     * 充值订单列表
+     * @param Request $request
+     * @return array
+     */
+    public function recharge_order_list(Request $request): array
+    {
+        $email = $request->get('email');
+        $limit = $request->get('limit', 10);
+        $where = [];
+        if ($email) {
+            $where['email'] = $email;
+        }
+        $list = Recharge::getPaginate($where, [], $limit);
+        return Response::success($list);
+    }
+
+    /**
+     * 充值订单确认
+     * @param Id $request
+     * @return array
+     * @throws \Throwable
+     */
+    public function recharge_order_confirm(Id $request): array
+    {
+        $id = $request->get('id');
+        DB::beginTransaction();
+        try {
+            $check = Recharge::getOne(['id' => $id]);
+            if (0 == $check['status']) {
+                // 修改钱包余额
+                $UsersWallet = UsersWallet::getOne(['user_id' => $check['user_id'], 'trading_pair_id' => $check['trading_pair_id']]);
+                // 充值后的余额 = 对应钱包可用余额 + 充值余额
+                $available = $UsersWallet['available'] + $check['recharge_num'];
+                UsersWallet::EditData(['id' => $UsersWallet['id']], ['available' => $available]);
+                // 记录钱包流水
+                WalletStream::AddData([
+                    'trading_pair_id'   => $check['trading_pair_id'],     // 交易对ID
+                    'trading_pair_name' => $check['trading_pair_name'],  // 交易对名称
+                    'user_id'           => $check['user_id'],   // 用户id
+                    'email'             => $check['email'], // 用户邮箱
+                    'amount'            => $check['recharge_num'],  // 流转金额
+                    'amount_before'     => $UsersWallet['available'],  // 流转前的余额
+                    'amount_after'      => $available,      // 流转后的余额
+                    'way'               => '1', // 流转方式 1 收入 2 支出
+                    'type'              => '6', // 流转类型 1 币币交易 2 永续合约 3 期权合约 4 申购交易 5 划转 6 充值 7 提现 8 冻结
+                    'type_detail'       => '1', // 流转详细类型  1 USDT充值  2 银行卡充值  3 币币交易手续费  4 永续合约手续费  5 期权合约手续费  6 币币账户划转到合约账户  7 合约账户划转到币币账户  8 申购冻结  9 币币交易  10 永续合约  11 期权合约
+                ]);
+                $Recharge = Recharge::EditData(['id' => $id], ['status' => '1']);
+                if ($Recharge) {
+                    AdminOperationLog::Info($request, "确认了，id为{$Recharge['id']}，的充值订单");
+                }
+            }
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            AdminOperationLog::Info($request, "确认充值订单失败", $e->getMessage());
+            return Response::error([], ErrorCode::MLG_Error);
+        }
+        return Response::success();
+    }
+
+    /**
+     * 期权交易列表
+     */
+    public function option_contract_list(Request $request): array
+    {
+        $email = $request->get('email');
+        $limit = $request->get('limit', 10);
+        $where = [];
+        if ($email) {
+            $where['email'] = $email;
+        }
+        $list = OptionContractTransaction::getPaginate($where, [], $limit);
+        return Response::success($list);
+    }
+
+    /**
+     * 永续交易列表
+     * @param Request $request
+     * @return array
+     */
+    public function perpetual_contract_list(Request $request): array
+    {
+        $email = $request->get('email');
+        $limit = $request->get('limit', 10);
+        $where = [];
+        if ($email) {
+            $where['email'] = $email;
+        }
+        $list = PerpetualContractTransaction::getPaginate($where, [], $limit);
+        return Response::success($list);
+    }
+
+    /**
+     * 币币交易列表
+     * @param Request $request
+     * @return array
+     */
+    public function currency_order_list(Request $request): array
+    {
+        $email            = $request->get('email');
+        $currency_id      = $request->get('currency_id'); // 币种id
+        $order_type       = $request->get('order_type'); // 挂单类型：1-限价 2-市价
+        $transaction_type = $request->get('transaction_type'); // 订单方向：1-买入 2-卖出
+        $status           = $request->get('status'); // 状态：0 交易中 1 已完成 2 已撤单
+        $limit            = $request->get('limit', 10);
+        $where            = [];
+        if ($email) {
+            $where['email'] = $email;
+        }
+        if ($currency_id) {
+            $where['currency_id'] = $currency_id;
+        }
+        if ($order_type) {
+            $where['order_type'] = $order_type;
+        }
+        if ($transaction_type) {
+            $where['transaction_type'] = $transaction_type;
+        }
+        if ($status) {
+            $where['status'] = $status;
+        }
+        $list = CurrencyTransaction::getPaginate($where, [], $limit);
+        foreach ($list as $key => $val) {
+            unset($list[$key]['entrust_num']);
+            if ($val['status'] == 0) {
+                $list[$key]['clinch_num'] = "0.00";
+            }
+        }
+        return Response::success($list);
+    }
+
+
+    /**
+     * 币币交易订单状态操作
+     * @param CurrencyOrderConfirm $request
+     * @return array
+     * @throws \Throwable
+     */
+    public function currency_order_confirm(CurrencyOrderConfirm $request): array
+    {
+        $id     = $request->get('id');
+        $status = $request->get('status');
+        DB::beginTransaction();
+        try {
+            $CurrencyTransaction = CurrencyTransaction::EditData(['id' => $id], ['status' => $status]);
+            if ($CurrencyTransaction) {
+                AdminOperationLog::Info($request, "确认了，id为{$CurrencyTransaction['id']}，的币币交易状态为：{$status}");
+            }
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            AdminOperationLog::Info($request, "确认币币交易状态失败", $e->getMessage());
+            return Response::error([], ErrorCode::MLG_Error);
+        }
+        return Response::success();
+    }
+
+}
