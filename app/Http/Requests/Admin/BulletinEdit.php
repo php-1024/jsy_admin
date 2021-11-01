@@ -37,10 +37,8 @@ class BulletinEdit extends FormRequest
     public function rules(): array
     {
         return [
-            'id'       => 'required|numeric',
-            'language' => 'required|string|in:1,2,3',
-            'content'  => 'required|string',
-            'redirect' => 'required|string|between:1,200',
+            'id'      => 'required|numeric',
+            'content' => 'required|array',
         ];
     }
 }
