@@ -29,10 +29,16 @@ class BulletinController extends Controller
      */
     public function add(BulletinAdd $request): array
     {
+        $content = $request->get('content');
+        if (count($content) != 5) {
+            return Response::error([], ErrorCode::Vl_Error, '五种语言缺一不可');
+        }
         $add_data = [
-            'language' => $request->get('language'),
-            'content'  => $request->get('content'),
-            'redirect' => $request->get('redirect'),
+            'content_1' => $content[0],
+            'content_2' => $content[1],
+            'content_3' => $content[2],
+            'content_4' => $content[3],
+            'content_5' => $content[4],
         ];
         DB::beginTransaction();
         try {
@@ -45,7 +51,6 @@ class BulletinController extends Controller
             return Response::error([], ErrorCode::MLG_Error);
         }
         return Response::success();
-
     }
 
 
@@ -59,7 +64,7 @@ class BulletinController extends Controller
      */
     public function del(BulletinDel $request): array
     {
-        $id   = $request->get('id');
+        $id = $request->get('id');
         DB::beginTransaction();
         try {
             $tips = "";

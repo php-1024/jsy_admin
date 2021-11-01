@@ -37,9 +37,7 @@ class BulletinAdd extends FormRequest
     public function rules(): array
     {
         return [
-            'language' => 'required|string|in:1,2,3',
-            'content'  => 'required|string',
-            'redirect' => 'required|string|between:1,200',
+            'content' => 'required|array',
         ];
     }
 }
