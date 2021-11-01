@@ -383,6 +383,18 @@ class TableAdminMenus extends Seeder
             array(
                 'is_hidden'  => '1',                           // 是否显示 0否 1是
                 'type'       => '4',                           // 类型，1目录  2菜单 3按钮 4接口
+                'parent_id'  => '6',                           // 父级id
+                'icon'       => '',                            // 菜单图标，按钮图标为空
+                'sort'       => '6',                           // 排序值，数字越大越后面
+                'name'       => 'sys_authoritys',              // 菜单name
+                'cname'      => '系统权限',                     // 菜单中文名
+                'path_views' => 'api/admin/sys_authoritys',         // 路径
+                'created_at' => date('Y-m-d H:i:s'),    // 创建时间
+                'updated_at' => date('Y-m-d H:i:s'),    // 更新时间
+            ),
+            array(
+                'is_hidden'  => '1',                           // 是否显示 0否 1是
+                'type'       => '4',                           // 类型，1目录  2菜单 3按钮 4接口
                 'parent_id'  => '7',                           // 父级id
                 'icon'       => '',                            // 菜单图标，按钮图标为空
                 'sort'       => '0',                           // 排序值，数字越大越后面
@@ -649,6 +661,66 @@ class TableAdminMenus extends Seeder
                 'type'       => '4',                           // 类型，1目录  2菜单 3按钮 4接口
                 'parent_id'  => '3',                           // 父级id
                 'icon'       => '',                            // 菜单图标，按钮图标为空
+                'sort'       => '0',                           // 排序值，数字越大越后面
+                'name'       => 'user_status',                   // 菜单name
+                'cname'      => '修改用户状态',                     // 菜单中文名
+                'path_views' => 'api/admin/user/status',         // 路径
+                'created_at' => date('Y-m-d H:i:s'),    // 创建时间
+                'updated_at' => date('Y-m-d H:i:s'),    // 更新时间
+            ),
+            array(
+                'is_hidden'  => '1',                           // 是否显示 0否 1是
+                'type'       => '4',                           // 类型，1目录  2菜单 3按钮 4接口
+                'parent_id'  => '3',                           // 父级id
+                'icon'       => '',                            // 菜单图标，按钮图标为空
+                'sort'       => '0',                           // 排序值，数字越大越后面
+                'name'       => 'user_grade_setup',            // 菜单name
+                'cname'      => '用户等级设置',                  // 菜单中文名
+                'path_views' => 'api/admin/user/grade_setup',  // 路径
+                'created_at' => date('Y-m-d H:i:s'),    // 创建时间
+                'updated_at' => date('Y-m-d H:i:s'),    // 更新时间
+            ),
+            array(
+                'is_hidden'  => '1',                           // 是否显示 0否 1是
+                'type'       => '4',                           // 类型，1目录  2菜单 3按钮 4接口
+                'parent_id'  => '3',                           // 父级id
+                'icon'       => '',                            // 菜单图标，按钮图标为空
+                'sort'       => '0',                           // 排序值，数字越大越后面
+                'name'       => 'user_wallet_recharge',            // 菜单name
+                'cname'      => '钱包充值',                  // 菜单中文名
+                'path_views' => 'api/admin/user/wallet_recharge',  // 路径
+                'created_at' => date('Y-m-d H:i:s'),    // 创建时间
+                'updated_at' => date('Y-m-d H:i:s'),    // 更新时间
+            ),
+            array(
+                'is_hidden'  => '1',                           // 是否显示 0否 1是
+                'type'       => '4',                           // 类型，1目录  2菜单 3按钮 4接口
+                'parent_id'  => '3',                           // 父级id
+                'icon'       => '',                            // 菜单图标，按钮图标为空
+                'sort'       => '0',                           // 排序值，数字越大越后面
+                'name'       => 'user_wallet_lock',            // 菜单name
+                'cname'      => '钱包锁定',                  // 菜单中文名
+                'path_views' => 'api/admin/user/wallet_lock',  // 路径
+                'created_at' => date('Y-m-d H:i:s'),    // 创建时间
+                'updated_at' => date('Y-m-d H:i:s'),    // 更新时间
+            ),
+            array(
+                'is_hidden'  => '1',                           // 是否显示 0否 1是
+                'type'       => '4',                           // 类型，1目录  2菜单 3按钮 4接口
+                'parent_id'  => '3',                           // 父级id
+                'icon'       => '',                            // 菜单图标，按钮图标为空
+                'sort'       => '0',                           // 排序值，数字越大越后面
+                'name'       => 'user_wallet_reset',            // 菜单name
+                'cname'      => '重制地址',                  // 菜单中文名
+                'path_views' => 'api/admin/user/wallet_reset',  // 路径
+                'created_at' => date('Y-m-d H:i:s'),    // 创建时间
+                'updated_at' => date('Y-m-d H:i:s'),    // 更新时间
+            ),
+            array(
+                'is_hidden'  => '1',                           // 是否显示 0否 1是
+                'type'       => '4',                           // 类型，1目录  2菜单 3按钮 4接口
+                'parent_id'  => '3',                           // 父级id
+                'icon'       => '',                            // 菜单图标，按钮图标为空
                 'sort'       => '1',                           // 排序值，数字越大越后面
                 'name'       => 'user_edit',                   // 菜单name
                 'cname'      => '编辑用户',                     // 菜单中文名
@@ -689,6 +761,18 @@ class TableAdminMenus extends Seeder
                 'name'       => 'option_contract_add',             // 菜单name
                 'cname'      => '新增期权合约',                     // 菜单中文名
                 'path_views' => 'api/admin/currency/option_contract/add',  // 路径
+                'created_at' => date('Y-m-d H:i:s'),    // 创建时间
+                'updated_at' => date('Y-m-d H:i:s'),    // 更新时间
+            ),
+            array(
+                'is_hidden'  => '1',                           // 是否显示 0否 1是
+                'type'       => '4',                           // 类型，1目录  2菜单 3按钮 4接口
+                'parent_id'  => '27',                          // 父级id
+                'icon'       => '',                            // 菜单图标，按钮图标为空
+                'sort'       => '0',                           // 排序值，数字越大越后面
+                'name'       => 'option_contract_get_one',             // 菜单name
+                'cname'      => '获取单条期权合约信息',                     // 菜单中文名
+                'path_views' => 'api/admin/currency/option_contract/get_one',  // 路径
                 'created_at' => date('Y-m-d H:i:s'),    // 创建时间
                 'updated_at' => date('Y-m-d H:i:s'),    // 更新时间
             ),
@@ -805,6 +889,18 @@ class TableAdminMenus extends Seeder
                 'type'       => '4',                           // 类型，1目录  2菜单 3按钮 4接口
                 'parent_id'  => '26',                          // 父级id
                 'icon'       => '',                            // 菜单图标，按钮图标为空
+                'sort'       => '0',                           // 排序值，数字越大越后面
+                'name'       => 'perpetual_contract_get_one',               // 菜单name
+                'cname'      => '获取单条永续合约信息',                     // 菜单中文名
+                'path_views' => 'api/admin/currency/perpetual_contract/get_one',  // 路径
+                'created_at' => date('Y-m-d H:i:s'),    // 创建时间
+                'updated_at' => date('Y-m-d H:i:s'),    // 更新时间
+            ),
+            array(
+                'is_hidden'  => '1',                           // 是否显示 0否 1是
+                'type'       => '4',                           // 类型，1目录  2菜单 3按钮 4接口
+                'parent_id'  => '26',                          // 父级id
+                'icon'       => '',                            // 菜单图标，按钮图标为空
                 'sort'       => '1',                           // 排序值，数字越大越后面
                 'name'       => 'perpetual_contract_edit',               // 菜单name
                 'cname'      => '永续合约编辑',                     // 菜单中文名
@@ -853,10 +949,142 @@ class TableAdminMenus extends Seeder
                 'type'       => '4',                           // 类型，1目录  2菜单 3按钮 4接口
                 'parent_id'  => '29',                          // 父级id
                 'icon'       => '',                            // 菜单图标，按钮图标为空
+                'sort'       => '0',                           // 排序值，数字越大越后面
+                'name'       => 'apply_buy_get_code',               // 菜单name
+                'cname'      => '获取申购吗',                     // 菜单中文名
+                'path_views' => 'api/admin/currency/apply_buy/get_code',  // 路径
+                'created_at' => date('Y-m-d H:i:s'),    // 创建时间
+                'updated_at' => date('Y-m-d H:i:s'),    // 更新时间
+            ),
+            array(
+                'is_hidden'  => '1',                           // 是否显示 0否 1是
+                'type'       => '4',                           // 类型，1目录  2菜单 3按钮 4接口
+                'parent_id'  => '29',                          // 父级id
+                'icon'       => '',                            // 菜单图标，按钮图标为空
+                'sort'       => '0',                           // 排序值，数字越大越后面
+                'name'       => 'apply_buy_get_setup',               // 菜单name
+                'cname'      => '获取申购配置',                     // 菜单中文名
+                'path_views' => 'api/admin/currency/apply_buy/get_setup',  // 路径
+                'created_at' => date('Y-m-d H:i:s'),    // 创建时间
+                'updated_at' => date('Y-m-d H:i:s'),    // 更新时间
+            ),
+            array(
+                'is_hidden'  => '1',                           // 是否显示 0否 1是
+                'type'       => '4',                           // 类型，1目录  2菜单 3按钮 4接口
+                'parent_id'  => '29',                          // 父级id
+                'icon'       => '',                            // 菜单图标，按钮图标为空
                 'sort'       => '1',                           // 排序值，数字越大越后面
                 'name'       => 'apply_buy_list',              // 菜单name
                 'cname'      => '申购列表',                      // 菜单中文名
                 'path_views' => 'api/admin/currency/apply_buy/list',  // 路径
+                'created_at' => date('Y-m-d H:i:s'),    // 创建时间
+                'updated_at' => date('Y-m-d H:i:s'),    // 更新时间
+            ),
+            array(
+                'is_hidden'  => '1',                           // 是否显示 0否 1是
+                'type'       => '4',                           // 类型，1目录  2菜单 3按钮 4接口
+                'parent_id'  => '13',                          // 父级id
+                'icon'       => '',                            // 菜单图标，按钮图标为空
+                'sort'       => '1',                           // 排序值，数字越大越后面
+                'name'       => 'wallet_stream',              // 菜单name
+                'cname'      => '钱包流水',                      // 菜单中文名
+                'path_views' => 'api/admin/finance/wallet_stream',  // 路径
+                'created_at' => date('Y-m-d H:i:s'),    // 创建时间
+                'updated_at' => date('Y-m-d H:i:s'),    // 更新时间
+            ),
+            array(
+                'is_hidden'  => '1',                           // 是否显示 0否 1是
+                'type'       => '4',                           // 类型，1目录  2菜单 3按钮 4接口
+                'parent_id'  => '11',                          // 父级id
+                'icon'       => '',                            // 菜单图标，按钮图标为空
+                'sort'       => '1',                           // 排序值，数字越大越后面
+                'name'       => 'withdraw_order_list',              // 菜单name
+                'cname'      => '提现订单列表',                      // 菜单中文名
+                'path_views' => 'api/admin/finance/withdraw_order_list',  // 路径
+                'created_at' => date('Y-m-d H:i:s'),    // 创建时间
+                'updated_at' => date('Y-m-d H:i:s'),    // 更新时间
+            ),
+            array(
+                'is_hidden'  => '1',                           // 是否显示 0否 1是
+                'type'       => '4',                           // 类型，1目录  2菜单 3按钮 4接口
+                'parent_id'  => '11',                          // 父级id
+                'icon'       => '',                            // 菜单图标，按钮图标为空
+                'sort'       => '1',                           // 排序值，数字越大越后面
+                'name'       => 'withdraw_order_confirm',              // 菜单name
+                'cname'      => '提现订单确认',                      // 菜单中文名
+                'path_views' => 'api/admin/finance/withdraw_order_confirm',  // 路径
+                'created_at' => date('Y-m-d H:i:s'),    // 创建时间
+                'updated_at' => date('Y-m-d H:i:s'),    // 更新时间
+            ),
+            array(
+                'is_hidden'  => '1',                           // 是否显示 0否 1是
+                'type'       => '4',                           // 类型，1目录  2菜单 3按钮 4接口
+                'parent_id'  => '12',                          // 父级id
+                'icon'       => '',                            // 菜单图标，按钮图标为空
+                'sort'       => '1',                           // 排序值，数字越大越后面
+                'name'       => 'recharge_order_list',              // 菜单name
+                'cname'      => '充值订单列表',                      // 菜单中文名
+                'path_views' => 'api/admin/finance/recharge_order_list',  // 路径
+                'created_at' => date('Y-m-d H:i:s'),    // 创建时间
+                'updated_at' => date('Y-m-d H:i:s'),    // 更新时间
+            ),
+            array(
+                'is_hidden'  => '1',                           // 是否显示 0否 1是
+                'type'       => '4',                           // 类型，1目录  2菜单 3按钮 4接口
+                'parent_id'  => '12',                          // 父级id
+                'icon'       => '',                            // 菜单图标，按钮图标为空
+                'sort'       => '1',                           // 排序值，数字越大越后面
+                'name'       => 'recharge_order_confirm',              // 菜单name
+                'cname'      => '确认充值订单',                      // 菜单中文名
+                'path_views' => 'api/admin/finance/recharge_order_confirm',  // 路径
+                'created_at' => date('Y-m-d H:i:s'),    // 创建时间
+                'updated_at' => date('Y-m-d H:i:s'),    // 更新时间
+            ),
+            array(
+                'is_hidden'  => '1',                           // 是否显示 0否 1是
+                'type'       => '4',                           // 类型，1目录  2菜单 3按钮 4接口
+                'parent_id'  => '14',                          // 父级id
+                'icon'       => '',                            // 菜单图标，按钮图标为空
+                'sort'       => '1',                           // 排序值，数字越大越后面
+                'name'       => 'option_contract_list',              // 菜单name
+                'cname'      => '期权交易列表',                      // 菜单中文名
+                'path_views' => 'api/admin/finance/option_contract_list',  // 路径
+                'created_at' => date('Y-m-d H:i:s'),    // 创建时间
+                'updated_at' => date('Y-m-d H:i:s'),    // 更新时间
+            ),
+            array(
+                'is_hidden'  => '1',                           // 是否显示 0否 1是
+                'type'       => '4',                           // 类型，1目录  2菜单 3按钮 4接口
+                'parent_id'  => '15',                          // 父级id
+                'icon'       => '',                            // 菜单图标，按钮图标为空
+                'sort'       => '1',                           // 排序值，数字越大越后面
+                'name'       => 'perpetual_contract_list',              // 菜单name
+                'cname'      => '永续交易列表',                      // 菜单中文名
+                'path_views' => 'api/admin/finance/perpetual_contract_list',  // 路径
+                'created_at' => date('Y-m-d H:i:s'),    // 创建时间
+                'updated_at' => date('Y-m-d H:i:s'),    // 更新时间
+            ),
+            array(
+                'is_hidden'  => '1',                           // 是否显示 0否 1是
+                'type'       => '4',                           // 类型，1目录  2菜单 3按钮 4接口
+                'parent_id'  => '28',                          // 父级id
+                'icon'       => '',                            // 菜单图标，按钮图标为空
+                'sort'       => '1',                           // 排序值，数字越大越后面
+                'name'       => 'currency_order_list',              // 菜单name
+                'cname'      => '币币交易列表',                      // 菜单中文名
+                'path_views' => 'api/admin/finance/currency_order_list',  // 路径
+                'created_at' => date('Y-m-d H:i:s'),    // 创建时间
+                'updated_at' => date('Y-m-d H:i:s'),    // 更新时间
+            ),
+            array(
+                'is_hidden'  => '1',                           // 是否显示 0否 1是
+                'type'       => '4',                           // 类型，1目录  2菜单 3按钮 4接口
+                'parent_id'  => '28',                          // 父级id
+                'icon'       => '',                            // 菜单图标，按钮图标为空
+                'sort'       => '1',                           // 排序值，数字越大越后面
+                'name'       => 'currency_order_confirm',              // 菜单name
+                'cname'      => '币币交易订单状态操作',                      // 菜单中文名
+                'path_views' => 'api/admin/finance/currency_order_confirm',  // 路径
                 'created_at' => date('Y-m-d H:i:s'),    // 创建时间
                 'updated_at' => date('Y-m-d H:i:s'),    // 更新时间
             ),
