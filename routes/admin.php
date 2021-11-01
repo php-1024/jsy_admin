@@ -88,35 +88,6 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'middleware' => 'admi
     });
 
 
-    // 帮助管理
-    Route::group(['prefix' => 'help'], function () {
-        // 添加帮助
-        Route::post('add', 'HelpController@add');
-        // 删除帮助
-        Route::post('del', 'HelpController@del');
-        // 编辑帮助
-        Route::post('edit', 'HelpController@edit');
-        // 获取帮助信息
-        Route::post('get', 'HelpController@get');
-        // 获取帮助列表
-        Route::post('list', 'HelpController@list');
-    });
-
-    // 新闻管理
-    Route::group(['prefix' => 'news'], function () {
-        // 添加新闻
-        Route::post('add', 'NewsController@add');
-        // 删除新闻
-        Route::post('del', 'NewsController@del');
-        // 编辑新闻
-        Route::post('edit', 'NewsController@edit');
-        // 获取新闻信息
-        Route::post('get', 'NewsController@get');
-        // 获取新闻列表
-        Route::post('list', 'NewsController@list');
-    });
-
-
     // 用户管理
     Route::group(['prefix' => 'user'], function () {
         // 用户列表

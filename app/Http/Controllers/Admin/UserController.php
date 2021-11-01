@@ -35,15 +35,15 @@ class UserController extends Controller
             'id',
             'email',
             'is_agent',
+            'parent_id',
             'share_code',
             'risk_profit',
+            'agent_dividend',
             'last_login_ip',
             'created_at',
             'created_at',
             'updated_at',
             'status',
-            'partner_level',
-            'agent_dividend',
         ];
         $where     = [];
         if (!empty($userEmail)) {
