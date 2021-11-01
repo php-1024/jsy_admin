@@ -21,6 +21,8 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'middleware' => 'admi
 
     // 获取用户信息
     Route::post('info', 'AdminController@info');
+    // todo::首页
+    Route::post('index', 'AdminController@index');
     // 获取菜单路径
     Route::post('menus', 'AdminController@menus');
     // 添加管理员
@@ -49,7 +51,7 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'middleware' => 'admi
         Route::post('list', 'MenusController@list');
     });
 
-    // 全局管理
+    // v3 全局管理
     Route::group(['prefix' => 'global'], function () {
         // 设置全局参数
         Route::post('set', 'GlobalsController@set');

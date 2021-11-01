@@ -20,6 +20,39 @@ use Illuminate\Support\Facades\DB;
 class AdminController extends Controller
 {
     /**
+     * 首页
+     * @param Request $request
+     * @return array
+     */
+    public function index(Request $request): array
+    {
+        $result = [];
+        // 全部用户
+        $result['all_user_count'] = 0;
+        // 代理数
+        $result['all_agent_count'] = 0;
+        // 今日新增用户
+        $result['today_add'] = 0;
+        // 今日充值 USDT
+        $result['today_charge'] = 0;
+        // 总充值额
+        $result['all_charge'] = 0;
+        // 今日币币交易
+        $result['currency_today'] = 0;
+        // 币币总交易量
+        $result['currency_all'] = 0;
+        // 今日永续合约
+        $result['perpetual_today'] = 0;
+        // 永续合约总交易量
+        $result['perpetual_all'] = 0;
+        // 今日期权交易
+        $result['option_today'] = 0;
+        // 期权交易总交易量
+        $result['option_all'] = 0;
+        return Response::success($result);
+    }
+
+    /**
      * 获取登录用户信息
      * @param Request $request
      * @return array
