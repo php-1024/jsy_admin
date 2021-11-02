@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 class CreateCurrency extends Migration
 {
     /**
-     * 货币管理
+     * 交易对管理
      * Run the migrations.
      *
      * @return void
@@ -30,7 +30,7 @@ class CreateCurrency extends Migration
             $table->dateTime('deleted_at')->nullable()->comment('删除时间，为 null 则是没删除');
         });
         $prefix = DB::getConfig('prefix');
-        \DB::statement("ALTER TABLE `{$prefix}currency` comment '货币管理'");
+        \DB::statement("ALTER TABLE `{$prefix}currency` comment '交易对管理'");
     }
 
     /**

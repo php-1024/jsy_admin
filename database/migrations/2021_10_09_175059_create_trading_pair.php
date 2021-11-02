@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Schema;
 class CreateTradingPair extends Migration
 {
     /**
-     * 交易对管理
+     * 钱包对管理
      * Run the migrations.
      *
      * @return void
@@ -18,14 +18,14 @@ class CreateTradingPair extends Migration
     public function up()
     {
         Schema::create('trading_pair', function (Blueprint $table) {
-            $table->increments('id')->comment('主键id');
-            $table->string('name', 60)->comment('交易对名称');
+            $table->increments('id')->comment('钱包id');
+            $table->string('name', 60)->comment('钱包对名称');
             $table->dateTime('created_at')->default(date('Y-m-d H:i:s'))->comment('创建时间');
             $table->dateTime('updated_at')->default(date('Y-m-d H:i:s'))->comment('更新时间');
             $table->dateTime('deleted_at')->nullable()->comment('删除时间，为 null 则是没删除');
         });
         $prefix = DB::getConfig('prefix');
-        \DB::statement("ALTER TABLE `{$prefix}trading_pair` comment '交易对管理'");
+        \DB::statement("ALTER TABLE `{$prefix}trading_pair` comment '钱包对管理'");
     }
 
     /**
