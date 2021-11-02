@@ -17,6 +17,7 @@ class CreateUsersWallet extends Migration
         Schema::create('users_wallet', function (Blueprint $table) {
             $table->increments('id')->comment('主键id');
             $table->integer('user_id')->comment('用户id');
+            $table->integer('type')->default(0)->comment('钱包类型：1现货 2合约');
             $table->integer('trading_pair_id')->default(0)->comment('币种id');
             $table->string('trading_pair_name', 50)->nullable()->comment('交易对名称');
             $table->string('address', 50)->nullable()->comment('钱包地址');

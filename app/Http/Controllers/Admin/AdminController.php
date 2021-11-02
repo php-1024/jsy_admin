@@ -230,7 +230,7 @@ class AdminController extends Controller
     public function list(Request $request): array
     {
         $limit = $request->get('limit', 10);
-        $list  = Admin::getPaginate([], ['id', 'account', 'status', 'authoritys'], $limit, 'id', 'ASC');
+        $list  = Admin::getPaginate([], ['id', 'account', 'status', 'authoritys'], $limit, 'id');
         foreach ($list as $key => $val) {
             $admin      = Admin::getOne(['id' => $val['id']]);
             $authoritys = $admin['authoritys'];
