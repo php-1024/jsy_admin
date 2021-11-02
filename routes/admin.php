@@ -108,6 +108,8 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'middleware' => 'admi
         Route::post('wallet_empty', 'UserController@wallet_empty');
         // 重制地址
         Route::post('wallet_reset', 'UserController@wallet_reset');
+        // todo::提币地址
+        Route::post('wallet_address', 'UserController@wallet_address');
     });
 
 

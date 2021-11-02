@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\Id;
 use App\Http\Requests\Admin\UserEdit;
 use App\Http\Requests\Admin\UserGetSub;
 use App\Http\Requests\Admin\UserGrade;
+use App\Http\Requests\Admin\UserId;
 use App\Http\Requests\Admin\UserIsAgent;
 use App\Http\Requests\Admin\UserStatus;
 use App\Http\Requests\Admin\UserWalletCharge;
@@ -16,6 +17,7 @@ use App\Library\Tools;
 use App\Models\AdminOperationLog;
 use App\Models\User;
 use App\Models\UsersWallet;
+use App\Models\WalletAddress;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
@@ -260,6 +262,19 @@ class UserController extends Controller
             }
         }
         return Response::success();
+    }
+
+
+    /**
+     * 提币地址
+     * @param UserId $request
+     * @return array[]
+     */
+    public function wallet_address(UserId $request): array
+    {
+        $user_id = $request->get('user_id');
+        $list    = WalletAddress::getList(['user_id' => $user_id]);
+        return Response::success($list);
     }
 
 }
