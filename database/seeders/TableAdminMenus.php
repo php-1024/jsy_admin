@@ -938,9 +938,9 @@ class TableAdminMenus extends Seeder
                 'parent_id'  => '29',                          // 父级id
                 'icon'       => '',                            // 菜单图标，按钮图标为空
                 'sort'       => '0',                           // 排序值，数字越大越后面
-                'name'       => 'apply_buy_setup',               // 菜单name
-                'cname'      => '申购币种设置',                     // 菜单中文名
-                'path_views' => 'api/admin/currency/apply_buy/setup',  // 路径
+                'name'       => 'apply_buy_add',               // 菜单name
+                'cname'      => '新建申购币种',                     // 菜单中文名
+                'path_views' => 'api/admin/currency/apply_buy/add',  // 路径
                 'created_at' => date('Y-m-d H:i:s'),    // 创建时间
                 'updated_at' => date('Y-m-d H:i:s'),    // 更新时间
             ),
@@ -951,7 +951,7 @@ class TableAdminMenus extends Seeder
                 'icon'       => '',                            // 菜单图标，按钮图标为空
                 'sort'       => '0',                           // 排序值，数字越大越后面
                 'name'       => 'apply_buy_get_code',               // 菜单name
-                'cname'      => '获取申购吗',                     // 菜单中文名
+                'cname'      => '获取申购码',                     // 菜单中文名
                 'path_views' => 'api/admin/currency/apply_buy/get_code',  // 路径
                 'created_at' => date('Y-m-d H:i:s'),    // 创建时间
                 'updated_at' => date('Y-m-d H:i:s'),    // 更新时间
@@ -962,9 +962,45 @@ class TableAdminMenus extends Seeder
                 'parent_id'  => '29',                          // 父级id
                 'icon'       => '',                            // 菜单图标，按钮图标为空
                 'sort'       => '0',                           // 排序值，数字越大越后面
-                'name'       => 'apply_buy_get_setup',               // 菜单name
+                'name'       => 'apply_buy_get',               // 菜单name
                 'cname'      => '获取申购配置',                     // 菜单中文名
-                'path_views' => 'api/admin/currency/apply_buy/get_setup',  // 路径
+                'path_views' => 'api/admin/currency/apply_buy/get',  // 路径
+                'created_at' => date('Y-m-d H:i:s'),    // 创建时间
+                'updated_at' => date('Y-m-d H:i:s'),    // 更新时间
+            ),
+            array(
+                'is_hidden'  => '1',                           // 是否显示 0否 1是
+                'type'       => '4',                           // 类型，1目录  2菜单 3按钮 4接口
+                'parent_id'  => '29',                          // 父级id
+                'icon'       => '',                            // 菜单图标，按钮图标为空
+                'sort'       => '0',                           // 排序值，数字越大越后面
+                'name'       => 'apply_buy_edit',               // 菜单name
+                'cname'      => '编辑申购币种',                     // 菜单中文名
+                'path_views' => 'api/admin/currency/apply_buy/edit',  // 路径
+                'created_at' => date('Y-m-d H:i:s'),    // 创建时间
+                'updated_at' => date('Y-m-d H:i:s'),    // 更新时间
+            ),
+            array(
+                'is_hidden'  => '1',                           // 是否显示 0否 1是
+                'type'       => '4',                           // 类型，1目录  2菜单 3按钮 4接口
+                'parent_id'  => '29',                          // 父级id
+                'icon'       => '',                            // 菜单图标，按钮图标为空
+                'sort'       => '0',                           // 排序值，数字越大越后面
+                'name'       => 'apply_buy_del',               // 菜单name
+                'cname'      => '删除申购币种',                     // 菜单中文名
+                'path_views' => 'api/admin/currency/apply_buy/del',  // 路径
+                'created_at' => date('Y-m-d H:i:s'),    // 创建时间
+                'updated_at' => date('Y-m-d H:i:s'),    // 更新时间
+            ),
+            array(
+                'is_hidden'  => '1',                           // 是否显示 0否 1是
+                'type'       => '4',                           // 类型，1目录  2菜单 3按钮 4接口
+                'parent_id'  => '29',                          // 父级id
+                'icon'       => '',                            // 菜单图标，按钮图标为空
+                'sort'       => '0',                           // 排序值，数字越大越后面
+                'name'       => 'apply_buy_status',               // 菜单name
+                'cname'      => '申购币种状态修改',                     // 菜单中文名
+                'path_views' => 'api/admin/currency/apply_buy/status',  // 路径
                 'created_at' => date('Y-m-d H:i:s'),    // 创建时间
                 'updated_at' => date('Y-m-d H:i:s'),    // 更新时间
             ),

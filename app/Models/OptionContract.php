@@ -32,6 +32,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Query\Builder|OptionContract withTrashed()
  * @method static \Illuminate\Database\Query\Builder|OptionContract withoutTrashed()
  * @mixin \Eloquent
+ * @property string $minimum 最低入场
+ * @method static \Illuminate\Database\Eloquent\Builder|OptionContract whereMinimum($value)
  */
 class OptionContract extends Base
 {

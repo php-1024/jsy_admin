@@ -42,6 +42,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Query\Builder|ApplyBuySetup withTrashed()
  * @method static \Illuminate\Database\Query\Builder|ApplyBuySetup withoutTrashed()
  * @mixin \Eloquent
+ * @property int|null $issue_price 发行价 1 = 多少个USDT
+ * @property string|null $detail 项目详情
+ * @property int $status 币种状态  0 关闭 1 开启
+ * @method static \Illuminate\Database\Eloquent\Builder|ApplyBuySetup whereDetail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ApplyBuySetup whereIssuePrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ApplyBuySetup whereStatus($value)
  */
 class ApplyBuySetup extends Base
 {

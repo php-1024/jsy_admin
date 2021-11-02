@@ -17,16 +17,16 @@ class CreateApplyBuySetup extends Migration
         Schema::create('apply_buy_setup', function (Blueprint $table) {
             $table->increments('id')->comment('主键id');
             $table->string('name')->comment('币种名称');
-            $table->integer('trading_pair_id')->nullable()->comment('交易对ID');
-            $table->string('trading_pair_name')->nullable()->comment('交易对名称');
-            $table->string('ratio')->default(1)->comment('购买比例');
+            $table->integer('issue_price')->nullable()->comment('发行价 1 = 多少个USDT');
             $table->dateTime('estimated_time')->comment('预计上线时间');
             $table->dateTime('start_time')->comment('开始申购时间');
             $table->dateTime('end_time')->comment('结束申购时间');
             $table->string('code', 100)->nullable()->comment('申购码');
             $table->tinyInteger('code_status')->nullable()->comment('申购码开关  0 关闭 1 开启');
-            $table->dateTime('created_at')->default(date('Y-m-d H:i:s'))->comment('创建时间');
-            $table->dateTime('updated_at')->default(date('Y-m-d H:i:s'))->comment('更新时间');
+            $table->text('detail')->nullable()->comment('项目详情');
+            $table->tinyInteger('status')->default('0')->comment('币种状态  0 关闭 1 开启');
+            $table->dateTime('created_at')->comment('创建时间');
+            $table->dateTime('updated_at')->comment('更新时间');
             $table->dateTime('deleted_at')->nullable()->comment('删除时间，为 null 则是没删除');
         });
         $prefix = DB::getConfig('prefix');

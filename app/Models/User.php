@@ -57,6 +57,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @method static \Illuminate\Database\Query\Builder|User withTrashed()
  * @method static \Illuminate\Database\Query\Builder|User withoutTrashed()
  * @mixin \Eloquent
+ * @property int $parent_id 上级用户id
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereParentId($value)
  */
 class User extends Base
 {

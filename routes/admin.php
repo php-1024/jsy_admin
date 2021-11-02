@@ -163,13 +163,19 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'middleware' => 'admi
 
         // 申购管理
         Route::group(['prefix' => 'apply_buy'], function () {
-            // 申购币种设置
-            Route::post('setup', 'ApplyBuyController@setup');
             // 获取申购吗
             Route::post('get_code', 'ApplyBuyController@get_code');
+            // 新建申购币种
+            Route::post('add', 'ApplyBuyController@add');
             // 获取申购配置
-            Route::post('get_setup', 'ApplyBuyController@get_setup');
-            // 列表
+            Route::post('get', 'ApplyBuyController@get');
+            // 编辑申购币种
+            Route::post('edit', 'ApplyBuyController@edit');
+            // 删除申购币种
+            Route::post('del', 'ApplyBuyController@del');
+            // 申购币种状态修改
+            Route::post('status', 'ApplyBuyController@status');
+            // 申购币种列表
             Route::post('list', 'ApplyBuyController@list');
         });
     });

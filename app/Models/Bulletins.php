@@ -30,6 +30,16 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Query\Builder|Bulletins withTrashed()
  * @method static \Illuminate\Database\Query\Builder|Bulletins withoutTrashed()
  * @mixin \Eloquent
+ * @property string $content_1 繁体公告
+ * @property string $content_2 英文公告
+ * @property string $content_3 日文公告
+ * @property string $content_4 西班牙公告
+ * @property string $content_5 韩语公告
+ * @method static \Illuminate\Database\Eloquent\Builder|Bulletins whereContent1($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Bulletins whereContent2($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Bulletins whereContent3($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Bulletins whereContent4($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Bulletins whereContent5($value)
  */
 class Bulletins extends Base
 {

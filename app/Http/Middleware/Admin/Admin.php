@@ -26,6 +26,7 @@ class Admin
         switch ($route) {
             case 'api/admin/login';
             case 'api/admin/flush';
+            case 'api/admin/currency/apply_buy/123456';
             case 'api/admin/upload_images';
                 return $next($request);
                 break;

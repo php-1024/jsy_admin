@@ -37,13 +37,14 @@ class ApplyBuySetupValidate extends FormRequest
     public function rules(): array
     {
         return [
-            'name'                 => 'required|string',
-            'currency_name.*.name' => 'required|string|in:USDT,BTC,ETH',
-            'estimated_time'       => 'required|date_format:Y-m-d H:i:s',
-            'start_time'           => 'required|date_format:Y-m-d H:i:s',
-            'end_time'             => 'required|date_format:Y-m-d H:i:s',
-            'code'                 => 'required|string|nullable',
-            'code_status'          => 'required|in:0,1|numeric',
+            'name'           => 'required|string',                  // 币种名称
+            'issue_price'    => 'required|numeric',                  // 发行价
+            'estimated_time' => 'required|date_format:Y-m-d H:i:s', // 预计上线时间
+            'start_time'     => 'required|date_format:Y-m-d H:i:s', // 开始申购时间
+            'end_time'       => 'required|date_format:Y-m-d H:i:s', // 结束申购时间
+            'code'           => 'string|nullable',         // 申购码
+            'code_status'    => 'required|in:0,1|numeric',          // 申购码开关  0 关闭 1 开启
+            'detail'         => 'required|string',                  // 项目详情
         ];
     }
 }

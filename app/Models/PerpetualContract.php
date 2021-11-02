@@ -32,6 +32,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Query\Builder|PerpetualContract withTrashed()
  * @method static \Illuminate\Database\Query\Builder|PerpetualContract withoutTrashed()
  * @mixin \Eloquent
+ * @property string $multiple 倍数：10、25、50、100
+ * @property string $bail 保证金占比：100、50、25、10
+ * @property string $ratio 张数比例：1：？USDT
+ * @method static \Illuminate\Database\Eloquent\Builder|PerpetualContract whereBail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|PerpetualContract whereMultiple($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|PerpetualContract whereRatio($value)
  */
 class PerpetualContract extends Base
 {

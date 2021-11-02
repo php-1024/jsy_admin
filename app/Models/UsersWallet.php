@@ -40,6 +40,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @method static \Illuminate\Database\Query\Builder|UsersWallet withTrashed()
  * @method static \Illuminate\Database\Query\Builder|UsersWallet withoutTrashed()
  * @mixin \Eloquent
+ * @property int $type 钱包类型：1现货 2合约
+ * @method static \Illuminate\Database\Eloquent\Builder|UsersWallet whereType($value)
  */
 class UsersWallet extends Base
 {

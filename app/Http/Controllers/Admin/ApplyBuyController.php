@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Exceptions\ErrorCode;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ApplyBuySetupValidate;
+use App\Http\Requests\Admin\Id;
 use App\Http\Requests\Admin\OptionContractAdd;
 use App\Http\Requests\Admin\OptionContractEdit;
 use App\Library\Response;
@@ -21,47 +22,138 @@ class ApplyBuyController extends Controller
 {
 
     /**
-     * 申购币种设置
+     * 新建申购币种
      * @param ApplyBuySetupValidate $request
      * @return array
      * @throws \Throwable
      */
-    public function setup(ApplyBuySetupValidate $request): array
+    public function add(ApplyBuySetupValidate $request): array
     {
         $params = $request->all();
-        $result = [];
+        if (ApplyBuySetup::checkRowExists(['name' => $params['name']])) {
+            return Response::error([], ErrorCode::MLG_Error, '申购币种名称已存在');
+        }
+        if ($params['code_status']) {
+            return Response::error([], ErrorCode::MLG_Error, '请设置申购码');
+        }
         DB::beginTransaction();
         try {
-            foreach ($params['currency_name'] as $val) {
-                $id = TradingPair::getValue(['name' => $val['name']], 'id');
-                if (empty($id)) {
-                    return Response::error([], ErrorCode::MLG_Error, '交易对名称不正确');
-                }
-                $data = [
-                    'name'              => $params['name'],
-                    'trading_pair_id'   => $id,
-                    'trading_pair_name' => $val['name'],
-                    'ratio'             => $val[$val['name']],
-                    'estimated_time'    => $params['estimated_time'],
-                    'start_time'        => $params['start_time'],
-                    'end_time'          => $params['end_time'],
-                    'code_status'       => $params['code_status'],
-                    'code'              => $params['code'],
-                ];
-                if (ApplyBuySetup::checkRowExists(['trading_pair_name' => $val['name']])) {
-                    $result[] = ApplyBuySetup::EditData(['trading_pair_name' => $val['name']], $data);
-                } else {
-                    $result[] = ApplyBuySetup::AddData($data);
-                }
-            }
-            AdminOperationLog::Info($request, "申购币种设置成功");
+            $data = [
+                'name'           => $params['name'],// 币种名称
+                'issue_price'    => $params['issue_price'],// 发行价
+                'estimated_time' => $params['estimated_time'],// 预计上线时间
+                'start_time'     => $params['start_time'],// 开始申购时间
+                'end_time'       => $params['end_time'],// 结束申购时间
+                'code_status'    => $params['code_status'],// 申购码开关  0 关闭 1 开启
+                'code'           => $params['code'],// 申购码
+                'detail'         => $params['code'],// 项目详情
+                'status'         => "0",// 币种状态  0 关闭 1 开启
+            ];
+            ApplyBuySetup::AddData($data);
+            AdminOperationLog::Info($request, "申购币种创建成功");
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
-            AdminOperationLog::Info($request, "申购币种设置失败", $e->getMessage());
+            AdminOperationLog::Info($request, "申购币种创建失败", $e->getMessage());
             return Response::error([], ErrorCode::MLG_Error, $e->getMessage());
         }
-        return Response::success(['apply_buy_setup' => $result]);
+        return Response::success();
+    }
+
+    /**
+     * 编辑申购币种
+     * @param ApplyBuySetupValidate $request
+     * @return array
+     * @throws \Throwable
+     */
+    public function edit(ApplyBuySetupValidate $request): array
+    {
+        $params = $request->except('id');
+        $id     = $request->get('id');
+        $check  = ApplyBuySetup::getOne(['name' => $params['name']]);
+        if (!strlen($id)) {
+            return Response::error([], ErrorCode::MLG_Error, '请选择要编辑的币种，id未传输');
+        }
+        if ($params['code_status']) {
+            return Response::error([], ErrorCode::MLG_Error, '请设置申购码');
+        }
+        if ($check && $id != $check['id']) {
+            return Response::error([], ErrorCode::MLG_Error, '申购币种名称已存在，请重新设置其他名称');
+        }
+        DB::beginTransaction();
+        try {
+            $data = [
+                'name'           => $params['name'],// 币种名称
+                'issue_price'    => $params['issue_price'],// 发行价
+                'estimated_time' => $params['estimated_time'],// 预计上线时间
+                'start_time'     => $params['start_time'],// 开始申购时间
+                'end_time'       => $params['end_time'],// 结束申购时间
+                'code_status'    => $params['code_status'],// 申购码开关  0 关闭 1 开启
+                'code'           => $params['code'],// 申购码
+                'detail'         => $params['code'],// 项目详情
+                'status'         => "0",// 币种状态  0 关闭 1 开启
+            ];
+            ApplyBuySetup::EditData(['id' => $id], $data);
+            AdminOperationLog::Info($request, "申购币种编辑成功");
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            AdminOperationLog::Info($request, "申购币种编辑失败", $e->getMessage());
+            return Response::error([], ErrorCode::MLG_Error, $e->getMessage());
+        }
+        return Response::success();
+    }
+
+
+    /**
+     * 删除申购币种
+     * @param Id $request
+     * @return array[]|void
+     * @throws \Throwable
+     */
+    public function del(Id $request)
+    {
+        $id = $request->get('id');
+        DB::beginTransaction();
+        try {
+            ApplyBuySetup::selected_delete(['id' => $id]);
+            AdminOperationLog::Info($request, "申购币种删除成功：{$id}");
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            AdminOperationLog::Info($request, "申购币种删除失败", $e->getMessage());
+            return Response::error([], ErrorCode::MLG_Error, $e->getMessage());
+        }
+        return Response::success();
+    }
+
+
+    /**
+     * 申购币种状态修改
+     * @param Id $request
+     * @return array[]|void
+     * @throws \Throwable
+     */
+    public function status(Id $request)
+    {
+        $id            = $request->get('id');
+        $where         = ['id' => $id];
+        $ApplyBuySetup = ApplyBuySetup::getOne($where);
+        DB::beginTransaction();
+        try {
+            if ($ApplyBuySetup['status']) {
+                ApplyBuySetup::EditData($where, ['status' => '0']);
+            } else {
+                ApplyBuySetup::EditData($where, ['status' => '1']);
+            }
+            AdminOperationLog::Info($request, "申购币种：{$id} 的状态变更了");
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            AdminOperationLog::Info($request, "申购币种状态修改失败", $e->getMessage());
+            return Response::error([], ErrorCode::MLG_Error, $e->getMessage());
+        }
+        return Response::success();
     }
 
     /**
@@ -79,27 +171,14 @@ class ApplyBuyController extends Controller
     }
 
     /**
-     * 获取申购币种设置
-     * @param Request $request
+     * 获取申购配置信息
+     * @param Id $request
      * @return array
      */
-    public function get_setup(Request $request): array
+    public function get(Id $request): array
     {
-        $list   = ApplyBuySetup::getList();
-        $result = [];
-        if (count($list)) {
-            $result['name']           = $list[0]['name'];
-            $result['estimated_time'] = $list[0]['estimated_time'];
-            $result['start_time']     = $list[0]['start_time'];
-            $result['end_time']       = $list[0]['end_time'];
-            $result['code_status']    = $list[0]['code_status'];
-            $result['code']           = $list[0]['code'];
-            $result['currency_name']  = [];
-            foreach ($list as $key => $val) {
-                $result['currency_name'][$key]['name']                    = $val['trading_pair_name'];
-                $result['currency_name'][$key][$val['trading_pair_name']] = $val['ratio'];
-            }
-        }
+        $id     = $request->get('id');
+        $result = ApplyBuySetup::getOne(['id' => $id]);
         return Response::success($result);
     }
 
@@ -111,7 +190,7 @@ class ApplyBuyController extends Controller
     public function list(Request $request): array
     {
         $limit = $request->get('limit', 10);
-        $list  = ApplyBuy::getPaginate([], [], $limit);
+        $list  = ApplyBuySetup::getPaginate([], [], $limit);
         return Response::success($list);
     }
 }
