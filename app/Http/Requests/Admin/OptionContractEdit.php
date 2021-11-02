@@ -37,10 +37,11 @@ class OptionContractEdit extends FormRequest
     public function rules(): array
     {
         return [
-            'id' => 'required|numeric',
-            'seconds' => 'required|numeric',
-            'status' => 'required|in:0,1',
+            'id'           => 'required|numeric',
             'profit_ratio' => 'required|numeric',
+            'seconds'      => 'required|numeric',
+            'minimum'      => 'required|string',
+            'status'       => 'required|in:0,1',
         ];
     }
 }

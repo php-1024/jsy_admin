@@ -17,26 +17,17 @@ class TablePerpetualContract extends Seeder
     public function run()
     {
         \DB::table('perpetual_contract')->delete();
-
         $currency = Currency::all()->toArray();
         $this->command->info("当前有" . count($currency) . "种币种");
         $ids     = array_column($currency, "id");
         $inserts = [];
-        $types   = [1, 2];
-        foreach ($types as $vv) {
-            foreach ($ids as $key => $val) {
-                $inserts[$key]['currency_id'] = $val;            // 币种id
-                $inserts[$key]['type']        = $vv;             // 类型:1.手数,2.倍数
-                if ($vv == 1) {
-                    $inserts[$key]['value'] = "20,50,100,200"; // 手数值 （单位 % ）
-                }
-                if ($vv == 2) {
-                    $inserts[$key]['value'] = "20,50,100,200"; // 倍数值 （数字）
-                }
-                $inserts[$key]['status'] = '1';             // 状态:0.禁用,1.启用
-            }
-            $inserts && \DB::table('perpetual_contract')->insert($inserts);
+        foreach ($ids as $key => $val) {
+            $inserts[$key]['currency_id'] = $val;            // 币种id
+            $inserts[$key]['multiple']    = "20,50,100,200"; // 倍数：10,25,50,100
+            $inserts[$key]['bail']        = '100,50,25,10';  // 保证金占比：100、50、25、10
+            $inserts[$key]['ratio']       = '1';  // 张数比例：1：？USDT
         }
+        $inserts && \DB::table('perpetual_contract')->insert($inserts);
         $this->command->line("永续合约信息初始化完毕");
     }
 }

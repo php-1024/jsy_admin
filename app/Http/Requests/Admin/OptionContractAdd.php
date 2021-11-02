@@ -37,9 +37,10 @@ class OptionContractAdd extends FormRequest
     public function rules()
     {
         return [
-            'seconds' => 'required|numeric',
-            'status' => 'required|in:0,1',
             'profit_ratio' => 'required|numeric',
+            'seconds'      => 'required|numeric',
+            'minimum'      => 'required|string',
+            'status'       => 'required|in:0,1',
         ];
     }
 }

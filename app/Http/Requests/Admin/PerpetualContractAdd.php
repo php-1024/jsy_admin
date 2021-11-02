@@ -37,10 +37,10 @@ class PerpetualContractAdd extends FormRequest
     public function rules(): array
     {
         return [
-            'currency_id' => 'required|numeric',
-            'type'        => 'required|in:1,2',
-            'status'      => 'required|in:0,1',
-            'value'       => 'required|string',
+            'currency_id' => 'required|numeric',    // 交易对：交易对名称（从币种管理获取）
+            'multiple'    => 'required|string',     // 倍数：10、25、50、100
+            'bail'        => 'required|string',     // 保证金占比：100、50、25、10
+            'ratio'       => 'required|string',     // 张数比例：1：？USDT
         ];
     }
 }

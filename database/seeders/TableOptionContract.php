@@ -20,16 +20,19 @@ class TableOptionContract extends Seeder
             array(
                 'seconds'      => '60',
                 'status'       => '1',
+                'minimum'      => '1000',
                 'profit_ratio' => '95.00',
             ),
             array(
                 'seconds'      => '90',
                 'status'       => '1',
+                'minimum'      => '1000',
                 'profit_ratio' => '97.00',
             ),
             array(
                 'seconds'      => '120',
                 'status'       => '1',
+                'minimum'      => '1000',
                 'profit_ratio' => '98.00',
             ),
 

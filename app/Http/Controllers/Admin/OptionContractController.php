@@ -36,7 +36,7 @@ class OptionContractController extends Controller
             AdminOperationLog::Info($request, "添加期权合约失败", $e->getMessage());
             return Response::error([], ErrorCode::MLG_Error);
         }
-        return Response::success(['option_contract' => $option_contract]);
+        return Response::success($option_contract);
     }
 
     /**

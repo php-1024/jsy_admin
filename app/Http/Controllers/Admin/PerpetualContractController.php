@@ -26,7 +26,11 @@ class PerpetualContractController extends Controller
      */
     public function add(PerpetualContractAdd $request): array
     {
-        $add_data = $request->all();
+        $add_data    = $request->all();
+        $currency_id = $request->get('currency_id');
+        if (PerpetualContract::checkRowExists(['currency_id' => $currency_id])) {
+            return Response::error([], ErrorCode::MLG_Error, '该交易对已经添加永续合约相关信息');
+        }
         DB::beginTransaction();
         try {
             $perpetual_contract = PerpetualContract::AddData($add_data);
@@ -37,7 +41,7 @@ class PerpetualContractController extends Controller
             AdminOperationLog::Info($request, "添加永续合约失败", $e->getMessage());
             return Response::error([], ErrorCode::MLG_Error);
         }
-        return Response::success(['perpetual_contract' => $perpetual_contract]);
+        return Response::success($perpetual_contract);
     }
 
 
@@ -51,6 +55,13 @@ class PerpetualContractController extends Controller
     {
         $id        = $request->get('id');
         $edit_data = $request->except('id');
+        $currency_id = $request->get('currency_id');
+        $check = PerpetualContract::getOne(['currency_id'=>$currency_id]);
+        if ($check){
+            if ($id != $check['id']){
+                return Response::error([], ErrorCode::MLG_Error,'该交易对已经添加永续合约相关信息');
+            }
+        }
         DB::beginTransaction();
         try {
             PerpetualContract::EditData(['id' => $id], $edit_data);

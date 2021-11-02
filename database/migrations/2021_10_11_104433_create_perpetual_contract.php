@@ -16,10 +16,10 @@ class CreatePerpetualContract extends Migration
     {
         Schema::create('perpetual_contract', function (Blueprint $table) {
             $table->increments('id')->comment('主键id');
-            $table->integer('currency_id')->comment('币种id');
-            $table->tinyInteger('type')->default(1)->comment('类型:1.手数,2.倍数');
-            $table->string('value')->comment('值');
-            $table->tinyInteger('status')->default(0)->comment('状态:0.禁用,1.启用');
+            $table->integer('currency_id')->comment('交易对id（从币种管理获取）');
+            $table->string('multiple')->comment('倍数：10、25、50、100');
+            $table->string('bail')->comment('保证金占比：100、50、25、10');
+            $table->string('ratio')->comment('张数比例：1：？USDT');
             $table->dateTime('created_at')->default(date('Y-m-d H:i:s'))->comment('创建时间');
             $table->dateTime('updated_at')->default(date('Y-m-d H:i:s'))->comment('更新时间');
             $table->dateTime('deleted_at')->nullable()->comment('删除时间，为 null 则是没删除');
