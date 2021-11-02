@@ -32,7 +32,7 @@ class TableUserWallet extends Seeder
                     'user_id'         => $vv['id'],
                     'type'            => 1, // 现货钱包
                     'trading_pair_id' => $val['id']
-                ])->first()->toArray()) {
+                ])->first()) {
                     continue;
                 }
                 $inserts_1[$key]['user_id']           = $vv['id'];          // 用户id
@@ -47,7 +47,7 @@ class TableUserWallet extends Seeder
                     'user_id'         => $vv['id'],
                     'type'            => 2, // 合约钱包
                     'trading_pair_id' => $val['id']
-                ])->first()->toArray()) {
+                ])->first()) {
                     continue;
                 }
                 $inserts_2[$key]['user_id']           = $vv['id'];          // 用户id
