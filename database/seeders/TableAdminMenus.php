@@ -698,9 +698,9 @@ class TableAdminMenus extends Seeder
                 'parent_id'  => '3',                           // 父级id
                 'icon'       => '',                            // 菜单图标，按钮图标为空
                 'sort'       => '0',                           // 排序值，数字越大越后面
-                'name'       => 'user_wallet_lock',            // 菜单name
-                'cname'      => '钱包锁定',                  // 菜单中文名
-                'path_views' => 'api/admin/user/wallet_lock',  // 路径
+                'name'       => 'user_wwallet_empty',            // 菜单name
+                'cname'      => '钱包清空',                  // 菜单中文名
+                'path_views' => 'api/admin/user/wallet_empty',  // 路径
                 'created_at' => date('Y-m-d H:i:s'),    // 创建时间
                 'updated_at' => date('Y-m-d H:i:s'),    // 更新时间
             ),

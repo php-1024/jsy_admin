@@ -104,8 +104,8 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'middleware' => 'admi
         Route::post('wallet_list', 'UserController@wallet_list');
         // 钱包充值
         Route::post('wallet_recharge', 'UserController@wallet_recharge');
-        // 钱包锁定
-        Route::post('wallet_lock', 'UserController@wallet_lock');
+        // 钱包清空
+        Route::post('wallet_empty', 'UserController@wallet_empty');
         // 重制地址
         Route::post('wallet_reset', 'UserController@wallet_reset');
     });

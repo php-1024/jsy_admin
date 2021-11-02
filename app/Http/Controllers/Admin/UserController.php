@@ -154,7 +154,7 @@ class UserController extends Controller
         $id    = $request->get('id');
         $user  = User::find($id);
         $list  = User::whereRaw("find_in_set({$id},user_path)")
-            ->select(['id','email'])
+            ->select(['id', 'email'])
             ->where("user_level", $user->user_level + 1)
             ->where('status', '0')
             ->paginate($limit);
@@ -168,9 +168,12 @@ class UserController extends Controller
      */
     public function wallet_list(UserWalletList $request): array
     {
-        $user_id = $request->get('user_id');
-        $limit   = $request->get('limit', 10);
-        $list    = UsersWallet::getPaginate(['user_id' => $user_id], ['id', 'trading_pair_id', 'trading_pair_name', 'available', 'freeze', 'total_assets', 'address', 'status'], $limit);
+        $user_id          = $request->get('user_id');
+        $type             = $request->get('type');
+        $limit            = $request->get('limit', 10);
+        $where['user_id'] = $user_id;
+        $where['type']    = $type;
+        $list             = UsersWallet::getPaginate($where, ['id', 'type', 'trading_pair_id', 'trading_pair_name', 'available', 'freeze', 'total_assets', 'address', 'status'], $limit);
         return Response::success($list);
     }
 
@@ -204,27 +207,28 @@ class UserController extends Controller
     }
 
     /**
-     * 钱包锁定
-     * @param UserStatus $request
+     * 清空钱包
+     * @param Id $request
      * @return array[]
      * @throws \Throwable
      */
-    public function wallet_lock(UserStatus $request): array
+    public function wallet_empty(Id $request)
     {
-        $id     = $request->get('id');
-        $status = $request->get('status');
+        $id = $request->get('id');
         if (UsersWallet::checkRowExists(['id' => $id])) {
             $edit_data = [
-                'status' => $status
+                'available'    => 0,
+                'freeze'       => 0,
+                'total_assets' => 0,
             ];
             DB::beginTransaction();
             try {
                 UsersWallet::EditData(['id' => $id], $edit_data);
-                AdminOperationLog::Info($request, "修改了钱包 ID：{$id}，的状态为：{$status}");
+                AdminOperationLog::Info($request, "将钱包 ID：{$id}，清空了");
                 DB::commit();
             } catch (\Exception $e) {
                 DB::rollBack();
-                AdminOperationLog::Info($request, "钱包锁定失败", $e->getMessage());
+                AdminOperationLog::Info($request, "钱包清空失败", $e->getMessage());
                 return Response::error([], ErrorCode::MLG_Error);
             }
         }

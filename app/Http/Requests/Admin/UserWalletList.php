@@ -38,6 +38,7 @@ class UserWalletList extends FormRequest
     {
         return [
             'user_id' => 'required|numeric',
+            'type'    => 'required|numeric|in:1,2',
         ];
     }
 }
