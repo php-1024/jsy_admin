@@ -31,10 +31,11 @@ class UserController extends Controller
      */
     public function list(Request $request): array
     {
-        $limit     = $request->get('limit', 10);
-        $value     = $request->get('value');
-        $userEmail = $request->get('userEmail');
-        $fields    = [
+        $limit  = $request->get('limit', 10);
+        $type   = $request->get('type');
+        $value  = $request->get('value');
+        $other  = $request->get('other');
+        $fields = [
             'id',
             'email',
             'is_agent',
@@ -48,12 +49,31 @@ class UserController extends Controller
             'updated_at',
             'status',
         ];
-        $where     = [];
-        if (!empty($userEmail)) {
-            $where['email'] = $userEmail;
+        $where  = [];
+        if (strlen($value)) {
+            switch ($type) {
+                case "1": // 用户邮箱
+                    $where['email'] = (string)$value;
+                    break;
+                case "2": // 上级代理
+                    $where['parent_id'] = (string)$value;
+                    break;
+                case "3": // 用户邀请码
+                    $where['share_code'] = (string)$value;
+                    break;
+            }
         }
-        if (is_numeric($value)) {
-            $where['is_agent'] = $value;
+        if (strlen($other)) {
+            switch ($other) {
+                case "1": // 代理
+                    $where['is_agent'] = '1';
+                    break;
+                case "2": // 锁定
+                    $where['status'] = '1';
+                    break;
+                default:
+                    break;
+            }
         }
         $list = User::getPaginate($where, $fields, $limit, 'id');
         return Response::success($list);
