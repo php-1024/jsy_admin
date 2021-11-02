@@ -16,16 +16,13 @@ class CreateCurrency extends Migration
     {
         Schema::create('currency', function (Blueprint $table) {
             $table->increments('id')->comment('主键id');
-            $table->string('name', 60)->comment('名称');
-            $table->integer('trading_pair_id')->comment('交易对');
+            $table->string('name', 60)->comment('交易对名称');
+            $table->integer('trading_pair_id')->comment('钱包对id');
             $table->string('k_line_code', 120)->comment('K线图代码');
             $table->integer('decimal_scale')->default(0)->comment('自有币位数');
-            $table->string('type', 60)->nullable()->comment('交易显示：（币币交易，永续合约，期权合约）');
+            $table->string('type', 60)->nullable()->comment('交易显示：（1币币交易，2永续合约，3期权合约）');
             $table->tinyInteger('sort')->default(0)->comment('排序');
             $table->tinyInteger('is_hidden')->default(0)->comment('是否展示：0-否，1-展示');
-            $table->decimal('fluctuation_min', 10, 5)->default(0)->comment('行情波动值（小）');
-            $table->decimal('fluctuation_max', 10, 5)->default(0)->comment('行情波动值（大）');
-            $table->string('fee_currency_currency')->default(0)->comment('币币交易手续费%');
             $table->string('fee_perpetual_contract')->default(0)->comment('永续合约手续费%');
             $table->string('fee_option_contract')->default(0)->comment('期权合约手续费%');
             $table->dateTime('created_at')->default(date('Y-m-d H:i:s'))->comment('创建时间');

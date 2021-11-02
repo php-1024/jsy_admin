@@ -37,18 +37,15 @@ class CurrencyAdd extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string',
-            'trading_pair_id' => 'required|numeric',
-            'k_line_code' => 'required|string',
-            'decimal_scale' => 'required|numeric',
-            'type' => 'required|nullable',
-            'sort' => 'required|numeric',
-            'is_hidden' => 'required|numeric',
-            'fluctuation_min' => 'required|numeric',
-            'fluctuation_max' => 'required|numeric',
-            'fee_currency_currency' => 'required|numeric',
+            'name'                   => 'required|string',
+            'trading_pair_id'        => 'required|numeric',
+            'k_line_code'            => 'required|string',
+            'decimal_scale'          => 'required|numeric',
+            'type'                   => 'nullable|array',
+            'sort'                   => 'required|numeric',
+            'is_hidden'              => 'required|numeric',
             'fee_perpetual_contract' => 'required|numeric',
-            'fee_option_contract' => 'required|numeric',
+            'fee_option_contract'    => 'required|numeric',
         ];
     }
 }

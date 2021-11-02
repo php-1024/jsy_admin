@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\DB;
 class CurrencyController extends Controller
 {
     /**
-     * 添加币种
+     * 添加交易对
      * @param CurrencyAdd $request
      * @return array
      * @throws \Throwable
@@ -24,6 +24,10 @@ class CurrencyController extends Controller
     public function add(CurrencyAdd $request): array
     {
         $add_data = $request->all();
+        $name     = $request->get('name');
+        if (Currency::checkRowExists(['name' => $name])) {
+            return Response::error([], ErrorCode::MLG_Error, '该交易对名称已存在，请勿重复添加！');
+        }
         DB::beginTransaction();
         try {
             if (is_array($add_data['type'])) {
@@ -41,7 +45,7 @@ class CurrencyController extends Controller
     }
 
     /**
-     * 编辑币种
+     * 编辑交易对
      * @param CurrencyEdit $request
      * @return array
      * @throws \Throwable
@@ -50,24 +54,31 @@ class CurrencyController extends Controller
     {
         $id        = $request->get('id');
         $edit_data = $request->except('id');
+        $name      = $request->get('name');
+        $check     = Currency::getOne(['name' => $name]);
+        if ($check) {
+            if ($check['id'] != $id) {
+                return Response::error([], ErrorCode::MLG_Error, '该交易对名称已存在，请勿重复添加！');
+            }
+        }
         DB::beginTransaction();
         try {
             if (is_array($edit_data['type'])) {
                 $edit_data['type'] = implode(',', $edit_data['type']);
             }
             Currency::EditData(['id' => $id], $edit_data);
-            AdminOperationLog::Info($request, "编辑了一条币种信息,ID为{$id}");
+            AdminOperationLog::Info($request, "编辑了一条交易对信息,ID为{$id}");
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
-            AdminOperationLog::Info($request, "编辑币种信息失败", $e->getMessage());
+            AdminOperationLog::Info($request, "编辑交易对信息失败", $e->getMessage());
             return Response::error([], ErrorCode::MLG_Error);
         }
         return Response::success();
     }
 
     /**
-     * 获取币种信息
+     * 获取交易对信息
      * @param CurrencyGet $request
      * @return array
      */
@@ -100,13 +111,12 @@ class CurrencyController extends Controller
             ]
         ];
         foreach ($list as $key => $val) {
-            $result                       = array_filter($transaction_show, function ($data) use ($val) {
+            $result                  = array_filter($transaction_show, function ($data) use ($val) {
                 if (in_array($data['id'], explode(',', $val['type']))) {
                     return true;
                 }
             });
             $list[$key]['type_data'] = $result;
-            $list[$key]['fluctuation']    = [$val['fluctuation_min'], $val['fluctuation_max']];
         }
         return Response::success($list);
     }

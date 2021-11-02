@@ -25,7 +25,7 @@ class TradingPairController extends Controller
         DB::beginTransaction();
         try {
             // 添加数据
-            $trading_pair = TradingPair::AddData($add_data);
+            $trading_pair = TradingPair::AddData($add_data, $add_data);
             AdminOperationLog::Info($request, "添加了交易对ID{$trading_pair['id']}");
             DB::commit();
         } catch (\Exception $e) {

@@ -115,23 +115,23 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'middleware' => 'admi
 
     // 币种管理
     Route::group(['prefix' => 'currency'], function () {
-        // 交易对管理
+        // 钱包管理
         Route::group(['prefix' => 'trading_pair'], function () {
-            // 添加
+            // 添加钱包
             Route::post('add', 'TradingPairController@add');
-            // 列表
+            // 钱包列表
             Route::post('list', 'TradingPairController@list');
         });
 
-        // 币种管理
+        // 交易对管理
         Route::group(['prefix' => 'manage'], function () {
-            // 添加
+            // 添加交易对
             Route::post('add', 'CurrencyController@add');
-            // 编辑
+            // 编辑交易对
             Route::post('edit', 'CurrencyController@edit');
-            // 获取币种信息
+            // 获取交易对信息
             Route::post('get', 'CurrencyController@get');
-            // 列表
+            // 交易对列表
             Route::post('list', 'CurrencyController@list');
         });
 
