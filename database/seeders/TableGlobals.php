@@ -26,7 +26,11 @@ class TableGlobals extends Seeder
                 'value'  => null,
             ),
             array(
-                'fields' => 'kf_address', // 客服连接地址
+                'fields' => 'kfh5_address', // 客服H5地址
+                'value'  => null,
+            ),
+            array(
+                'fields' => 'kfapp_address', // 客服APP地址
                 'value'  => null,
             ),
             array(
@@ -60,6 +64,26 @@ class TableGlobals extends Seeder
             array(
                 'fields' => 'trc20_wallet_address', // TRC20协议钱包地址
                 'value'  => '3',
+            ),
+            array(
+                'fields' => 'google_token', // 谷歌动态口令 0-关闭 1-开启
+                'value'  => '0',
+            ),
+            array(
+                'fields' => 'ios_version', // IOS版本号及下载地址
+                'value'  => null,
+            ),
+            array(
+                'fields' => 'ios_url', // IOS版本号及下载地址
+                'value'  => null,
+            ),
+            array(
+                'fields' => 'android_version', // 安卓版本号及下载地址
+                'value'  => null,
+            ),
+            array(
+                'fields' => 'android_url', // 安卓版本号及下载地址
+                'value'  => null,
             ),
         ));
     }

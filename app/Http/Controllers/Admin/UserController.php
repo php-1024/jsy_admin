@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\Id;
 use App\Http\Requests\Admin\UserEdit;
 use App\Http\Requests\Admin\UserGetSub;
 use App\Http\Requests\Admin\UserGrade;
+use App\Http\Requests\Admin\UserIsAgent;
 use App\Http\Requests\Admin\UserStatus;
 use App\Http\Requests\Admin\UserWalletCharge;
 use App\Http\Requests\Admin\UserWalletList;
@@ -52,7 +53,7 @@ class UserController extends Controller
         if (is_numeric($value)) {
             $where['is_agent'] = $value;
         }
-        $list = User::getPaginate($where, $fields, $limit, 'id', 'ASC');
+        $list = User::getPaginate($where, $fields, $limit, 'id');
         return Response::success($list);
     }
 
@@ -64,21 +65,20 @@ class UserController extends Controller
      */
     public function edit(UserEdit $request): array
     {
-        $id        = $request->get('id');
-        $email     = $request->get('email');
-        $password  = $request->get('password');
-        $edit_data = [
-            'risk_profit'    => $request->get('risk_profit'),
-            'partner_level'  => $request->get('partner_level'),   // 合伙人等级
-            'agent_dividend' => $request->get('agent_dividend'), // 代理红利
-        ];
-        // 有传递密码则修改
-        if (strlen($email)) {
-            $edit_data['email'] = $email;
-        }
+        $id             = $request->get('id');
+        $password       = $request->get('password');
+        $pay_password   = $request->get('pay_password');
+        $agent_dividend = $request->get('agent_dividend');
+        $edit_data      = [];
         // 有传递密码则修改
         if (strlen($password)) {
             $edit_data['password'] = Tools::md5($password);
+        }
+        if (strlen($pay_password)) {
+            $edit_data['pay_password'] = Tools::md5($pay_password);
+        }
+        if (strlen($agent_dividend)) {
+            $edit_data['agent_dividend'] = Tools::md5($agent_dividend);
         }
         DB::beginTransaction();
         try {
@@ -154,6 +154,7 @@ class UserController extends Controller
         $id    = $request->get('id');
         $user  = User::find($id);
         $list  = User::whereRaw("find_in_set({$id},user_path)")
+            ->select(['id','email'])
             ->where("user_level", $user->user_level + 1)
             ->where('status', '0')
             ->paginate($limit);

@@ -25,7 +25,8 @@ class GlobalsController extends Controller
     {
         $site_name            = $request->get('site_name');          // 网站名称
         $download_link        = $request->get('download_link');      // APP下载地址
-        $kf_address           = $request->get('kf_address');         // 客服连接地址
+        $kfh5_address         = $request->get('kfh5_address');         // 客服H5地址
+        $kfapp_address        = $request->get('kfapp_address');         // 客服APP地址
         $invitation_code      = $request->get('invitation_code');    // 邀请码开关 1：开启，0：关闭
         $withdrawal_fees      = $request->get('withdrawal_fees');    // 提现手续费 请填写百分比%
         $min_amount           = $request->get('min_amount');         // 最低提现额
@@ -34,10 +35,18 @@ class GlobalsController extends Controller
         $omni_wallet_address  = $request->get('omni_wallet_address'); // 钱包收款地址
         $erc20_wallet_address = $request->get('erc20_wallet_address');// 钱包收款地址
         $trc20_wallet_address = $request->get('trc20_wallet_address');// 钱包收款地址
-        $set_data             = [
+        $google_token         = $request->get('google_token');// 谷歌动态口令 0-关闭 1-开启
+        // IOS版本号及下载地址
+        $ios_version = $request->get('ios_version');
+        $ios_url     = $request->get('ios_url');
+        // 安卓版本号及下载地址
+        $android_version = $request->get('android_version');
+        $android_url     = $request->get('android_url');
+        $set_data        = [
             'site_name'            => $site_name,
             'download_link'        => $download_link,
-            'kf_address'           => $kf_address,
+            'kfh5_address'         => $kfh5_address,
+            'kfapp_address'        => $kfapp_address,
             'invitation_code'      => $invitation_code ? 1 : 0,
             'withdrawal_fees'      => $withdrawal_fees,
             'min_amount'           => $min_amount,
@@ -46,6 +55,11 @@ class GlobalsController extends Controller
             'omni_wallet_address'  => $omni_wallet_address,
             'erc20_wallet_address' => $erc20_wallet_address,
             'trc20_wallet_address' => $trc20_wallet_address,
+            'google_token'         => $google_token,
+            'ios_version'          => $ios_version,
+            'ios_url'              => $ios_url,
+            'android_version'      => $android_version,
+            'android_url'          => $android_url,
         ];
         DB::beginTransaction();
         try {
@@ -83,19 +97,21 @@ class GlobalsController extends Controller
         $whereIn = [
             'site_name'            => null,
             'download_link'        => null,
-            'kf_address'           => null,
+            'kfh5_address'         => null,
+            'kfapp_address'        => null,
             'invitation_code'      => null,
-            'transaction_fees'     => null,
             'withdrawal_fees'      => null,
             'min_amount'           => null,
-            'max_amount'           => null,
-            'daily_cumulative'     => null,
-            'max_number'           => null,
             'is_withdraw'          => null,
-            'proxy_ratio'          => null,
+            'increase_list'        => null,
             'omni_wallet_address'  => null,
             'erc20_wallet_address' => null,
             'trc20_wallet_address' => null,
+            'google_token'         => null,
+            'ios_version'          => null,
+            'ios_url'              => null,
+            'android_version'      => null,
+            'android_url'          => null,
         ];
         $whereIn = array_keys($whereIn);
         $globals = Globals::whereIn('fields', $whereIn)->select(['fields', 'value'])->get()->toArray();

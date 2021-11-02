@@ -38,11 +38,9 @@ class UserEdit extends FormRequest
     {
         return [
             'id'             => 'required|numeric',
-            'email'          => 'nullable|string|email',
             'password'       => 'nullable|string|between:6,20',
-            'risk_profit'    => 'required|numeric',
-            'partner_level'  => 'required|numeric',
-            'agent_dividend' => 'required|string',
+            'pay_password'   => 'nullable|string|between:6,20',
+            'agent_dividend' => 'required|numeric',
         ];
     }
 }
