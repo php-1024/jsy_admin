@@ -201,5 +201,6 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'middleware' => 'admi
         // 币币交易订单状态操作
         Route::post('currency_order_confirm', 'FinanceController@currency_order_confirm');
     });
-
+    // 登录 创建谷歌验证码
+    Route::get('create_google_code', 'LoginController@create_google_code');
 });

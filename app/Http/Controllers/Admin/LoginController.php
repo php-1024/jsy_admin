@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Exceptions\ErrorCode;
+use App\Library\PHPGangsta_GoogleAuthenticator;
 use App\Library\Response;
 use App\Library\Tools;
 use App\Models\Admin;
@@ -33,6 +34,21 @@ class LoginController extends Controller
         // 接收登录账号和密码
         $username = $request->get('username');
         $password = $request->get('password');
+
+        /**********谷歌验证码验证 start************/
+        $code = $request->get('code');//谷歌验证码
+        $secret = $request->get('secret');//扫码生成的秘钥
+
+        $obj = new PHPGangsta_GoogleAuthenticator();
+        if (empty($code) && strlen($code) != 6){
+            return Response::error([], ErrorCode::Login,'请正确输入手机上Google验证码');
+        }
+        $res = $obj->verifyCode($secret,$code);
+        if (!$res){
+            return Response::error([], ErrorCode::Login,'请正确输入手机上Google验证码');
+        }
+        /**********谷歌验证码验证 end************/
+
         // 密码加密处理
         $passwd = Tools::md5($password);
         // 查询账号信息
@@ -108,5 +124,25 @@ class LoginController extends Controller
     public function flush()
     {
         Cache::flush();
+    }
+
+    /**
+     * 创建谷歌验证码
+     */
+    public function create_google_code(): array
+    {
+        // 创建谷歌验证码
+        // 生成二维码
+        $ga = new PHPGangsta_GoogleAuthenticator();
+        $secret = $ga->createSecret();
+
+        $qrCodeUrl = $ga->getQRCodeGoogleUrl('身份验证', $secret);
+
+        $oneCode = $ga->getCode($secret);//生成code
+
+        return Response::success([
+            'secret' => $secret,
+            'qrCodeUrl' => $qrCodeUrl,
+        ]);
     }
 }
