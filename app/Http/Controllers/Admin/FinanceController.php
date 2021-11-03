@@ -273,10 +273,13 @@ class FinanceController extends Controller
             ->select(['currency_transaction.*', 'currency.trading_pair_id', 'currency.name'])
             ->first()->toArray();
         // 查找钱包
-        $UsersWallet1 = UsersWallet::getOne(['user_id' => $CurrencyTransaction['user_id'], 'trading_pair_id' => $CurrencyTransaction['trading_pair_id']]);
-        $UsersWallet2 = UsersWallet::getOne(['user_id' => $CurrencyTransaction['user_id'], 'trading_pair_name' => $CurrencyTransaction['name']]);
-        if (empty($UsersWallet1) || empty($UsersWallet2)) {
-            return Response::error([], ErrorCode::MLG_Error, '未找到钱包！');
+        $UsersWallet1 = UsersWallet::getOne(['user_id' => $CurrencyTransaction['user_id'], 'type' => '1', 'trading_pair_id' => $CurrencyTransaction['trading_pair_id']]);
+        $UsersWallet2 = UsersWallet::getOne(['user_id' => $CurrencyTransaction['user_id'], 'type' => '1', 'trading_pair_name' => $CurrencyTransaction['name']]);
+        if (empty($UsersWallet1)) {
+            return Response::error([], ErrorCode::MLG_Error, "未找到用户id[{$CurrencyTransaction['user_id']}]，交易对id[{$CurrencyTransaction['trading_pair_id']}]的相关钱包！");
+        }
+        if (empty($UsersWallet2)) {
+            return Response::error([], ErrorCode::MLG_Error, "未找到用户id[{$CurrencyTransaction['user_id']}]，交易对name[{$CurrencyTransaction['name']}]的相关钱包！");
         }
         DB::beginTransaction();
         try {
@@ -284,90 +287,46 @@ class FinanceController extends Controller
                 // 订单方向
                 if ($CurrencyTransaction['transaction_type'] == "1") {
                     // 1-买入
-                    // 支出操作
-                    $amount_before1 = $UsersWallet1['available'];                       // 流转前的余额
-                    $amount_after1  = $amount_before1 - $CurrencyTransaction['price'];  // 流转后的余额
-                    if ($amount_after1 < 0) {
-                        return Response::error([], ErrorCode::MLG_Error, '可用余额不足！');
-                    }
                     // 收入操作
-                    $amount_before2 = $UsersWallet2['available'];                           // 流转前的余额
-                    $amount_after2  = $amount_before2 + $CurrencyTransaction['clinch_num']; // 流转后的余额
-                    // 支出流水
-                    $walletStream1 = [
-                        'trading_pair_id'   => $UsersWallet1['trading_pair_id'],// 交易对ID
-                        'trading_pair_name' => $UsersWallet1['trading_pair_name'],// 交易对名称
-                        'user_id'           => $CurrencyTransaction['user_id'], // 用户id
-                        'email'             => $CurrencyTransaction['email'],   // 用户邮箱
-                        'amount'            => $CurrencyTransaction['price'],   // 流转金额
-                        'amount_before'     => $amount_before1,                 // 流转前的余额
-                        'amount_after'      => $amount_after1,                  // 流转后的余额
-                        'way'               => '2',                             // 流转方式 1 收入 2 支出
-                        'type'              => '1',                             // 流转类型 1 币币交易 2 永续合约 3 期权合约 4 申购交易 5 划转 6 充值 7 提现 8 冻结
-                        'type_detail'       => '9',                             // 流转详细类型  0 提现 1 USDT充值  2 银行卡充值  3 币币交易手续费  4 永续合约手续费  5 期权合约手续费  6 币币账户划转到合约账户  7 合约账户划转到币币账户  8 申购冻结  9 币币交易  10 永续合约  11 期权合约
-                    ];
+                    $amount_before = $UsersWallet2['available'];                           // 流转前的余额
+                    $amount_after  = $amount_before + $CurrencyTransaction['clinch_num'];  // 流转后的余额
                     // 收入流水
-                    $walletStream2 = [
+                    $walletStream = [
                         'trading_pair_id'   => $UsersWallet2['trading_pair_id'],// 交易对ID
                         'trading_pair_name' => $UsersWallet2['trading_pair_name'],// 交易对名称
                         'user_id'           => $CurrencyTransaction['user_id'], // 用户id
                         'email'             => $CurrencyTransaction['email'],   // 用户邮箱
                         'amount'            => $CurrencyTransaction['price'],   // 流转金额
-                        'amount_before'     => $amount_before2,                 // 流转前的余额
-                        'amount_after'      => $amount_after2,                  // 流转后的余额
+                        'amount_before'     => $amount_before,                  // 流转前的余额
+                        'amount_after'      => $amount_after,                   // 流转后的余额
                         'way'               => '1',                             // 流转方式 1 收入 2 支出
                         'type'              => '1',                             // 流转类型 1 币币交易 2 永续合约 3 期权合约 4 申购交易 5 划转 6 充值 7 提现 8 冻结
                         'type_detail'       => '9',                             // 流转详细类型  0 提现 1 USDT充值  2 银行卡充值  3 币币交易手续费  4 永续合约手续费  5 期权合约手续费  6 币币账户划转到合约账户  7 合约账户划转到币币账户  8 申购冻结  9 币币交易  10 永续合约  11 期权合约
                     ];
-                    UsersWallet::EditData(['id' => $UsersWallet1['id']], ['available' => $amount_after1]);
-                    UsersWallet::EditData(['id' => $UsersWallet2['id']], ['available' => $amount_after2]);
-                    // 记录钱包流水--支出流水
-                    WalletStream::AddData($walletStream1);
+                    UsersWallet::EditData(['id' => $UsersWallet2['id']], ['available' => $amount_after]);
                     // 记录钱包流水--收入流水
-                    WalletStream::AddData($walletStream2);
+                    WalletStream::AddData($walletStream);
                 } else if ($CurrencyTransaction['transaction_type'] == "2") {
                     // 2-卖出
-                    // 支出操作
-                    $amount_before2 = $UsersWallet2['available'];                       // 流转前的余额
-                    $amount_after2  = $amount_before2 - $CurrencyTransaction['price'];  // 流转后的余额
-                    if ($amount_after2 < 0) {
-                        return Response::error([], ErrorCode::MLG_Error, '可用余额不足！');
-                    }
                     // 收入操作
-                    $amount_before1 = $UsersWallet1['available'];                           // 流转前的余额
-                    $amount_after1  = $amount_before1 + $CurrencyTransaction['clinch_num']; // 流转后的余额
+                    $amount_before = $UsersWallet1['available'];                           // 流转前的余额
+                    $amount_after  = $amount_before + $CurrencyTransaction['clinch_num'];  // 流转后的余额
                     // 收入流水
-                    $walletStream1 = [
+                    $walletStream = [
                         'trading_pair_id'   => $UsersWallet1['trading_pair_id'],// 交易对ID
                         'trading_pair_name' => $UsersWallet1['trading_pair_name'],// 交易对名称
                         'user_id'           => $CurrencyTransaction['user_id'], // 用户id
                         'email'             => $CurrencyTransaction['email'],   // 用户邮箱
                         'amount'            => $CurrencyTransaction['price'],   // 流转金额
-                        'amount_before'     => $amount_before1,                 // 流转前的余额
-                        'amount_after'      => $amount_after1,                  // 流转后的余额
-                        'way'               => '2',                             // 流转方式 1 收入 2 支出
-                        'type'              => '1',                             // 流转类型 1 币币交易 2 永续合约 3 期权合约 4 申购交易 5 划转 6 充值 7 提现 8 冻结
-                        'type_detail'       => '9',                             // 流转详细类型  0 提现 1 USDT充值  2 银行卡充值  3 币币交易手续费  4 永续合约手续费  5 期权合约手续费  6 币币账户划转到合约账户  7 合约账户划转到币币账户  8 申购冻结  9 币币交易  10 永续合约  11 期权合约
-                    ];
-                    // 支出流水
-                    $walletStream2 = [
-                        'trading_pair_id'   => $UsersWallet2['trading_pair_id'],// 交易对ID
-                        'trading_pair_name' => $UsersWallet2['trading_pair_name'],// 交易对名称
-                        'user_id'           => $CurrencyTransaction['user_id'], // 用户id
-                        'email'             => $CurrencyTransaction['email'],   // 用户邮箱
-                        'amount'            => $CurrencyTransaction['price'],   // 流转金额
-                        'amount_before'     => $amount_before2,                 // 流转前的余额
-                        'amount_after'      => $amount_after2,                  // 流转后的余额
+                        'amount_before'     => $amount_before,                 // 流转前的余额
+                        'amount_after'      => $amount_after,                  // 流转后的余额
                         'way'               => '1',                             // 流转方式 1 收入 2 支出
                         'type'              => '1',                             // 流转类型 1 币币交易 2 永续合约 3 期权合约 4 申购交易 5 划转 6 充值 7 提现 8 冻结
                         'type_detail'       => '9',                             // 流转详细类型  0 提现 1 USDT充值  2 银行卡充值  3 币币交易手续费  4 永续合约手续费  5 期权合约手续费  6 币币账户划转到合约账户  7 合约账户划转到币币账户  8 申购冻结  9 币币交易  10 永续合约  11 期权合约
                     ];
-                    UsersWallet::EditData(['id' => $UsersWallet1['id']], ['available' => $amount_after1]);
-                    UsersWallet::EditData(['id' => $UsersWallet2['id']], ['available' => $amount_after2]);
+                    UsersWallet::EditData(['id' => $UsersWallet1['id']], ['available' => $amount_after]);
                     // 记录钱包流水--收入流水
-                    WalletStream::AddData($walletStream1);
-                    // 记录钱包流水--支出流水
-                    WalletStream::AddData($walletStream2);
+                    WalletStream::AddData($walletStream);
                 }
                 $CurrencyTransaction = CurrencyTransaction::EditData(['id' => $id], ['status' => $status]);
                 if ($CurrencyTransaction) {
