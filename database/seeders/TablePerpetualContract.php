@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Library\Tools;
 use App\Models\Currency;
 use Illuminate\Database\Seeder;
 
