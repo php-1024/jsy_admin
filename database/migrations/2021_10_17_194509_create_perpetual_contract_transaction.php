@@ -31,7 +31,6 @@ class CreatePerpetualContractTransaction extends Migration
             $table->string('entrust_price', 100)->nullable()->comment('委托价格');
             $table->string('ensure_amount', 100)->nullable()->comment('保证金');
             $table->string('handle_fee', 15)->comment('手续费，单位百分比');
-            $table->integer('hand_num')->comment('手数值');
             $table->integer('multiple')->comment('倍数值');
             $table->string('price')->comment('交易金额');
             $table->string('income')->nullable()->comment('最终收益');
