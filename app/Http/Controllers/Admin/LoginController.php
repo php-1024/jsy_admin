@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
 use Iszmxw\IpAddress\Address;
 use Ramsey\Uuid\Uuid;
 
@@ -63,11 +64,18 @@ class LoginController extends Controller
             $info['token']        = $token;
             $info['login_time']   = time();
             $info['refresh_time'] = time();
+            Redis::select(1);
+            $value = Redis::get($info['id']);
+            if ($value){
+                Cache::forget($value);
+                Redis::del($info['id']);
+            }
             DB::beginTransaction();
             try {
                 // 单位秒
                 $time = 60 * 60 * 12;// 12 小时
                 Cache::add($token, $info, $time);
+                Redis::set($info['id'],(string)$token);
                 AdminLoginLog::AddData([
                     'account_id' => $info['id'],
                     'account'    => $info['account'],
