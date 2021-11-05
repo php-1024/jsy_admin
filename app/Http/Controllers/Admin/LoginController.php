@@ -179,7 +179,6 @@ class LoginController extends Controller
             return Response::error([], ErrorCode::Login, '生成二维码失败');
         }
         return Response::success([
-            'secret'    => $secret,
             'qrCodeUrl' => $qrCodeUrl,
         ]);
     }
