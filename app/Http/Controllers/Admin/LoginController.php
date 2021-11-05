@@ -55,8 +55,10 @@ class LoginController extends Controller
         if ($google_token == "1") {
             /**********谷歌验证码验证 start************/
             $code   = $request->get('code');//谷歌验证码
-            $secret = $request->get('secret');//扫码生成的秘钥
-
+            $secret = Globals::getValue(['fields' => 'google_secret'], 'value');//扫码生成的秘钥
+            if (empty($secret)) {
+                return Response::error([], ErrorCode::Login, '生成的谷歌验证码有问题，请联系管理员');
+            }
             $obj = new PHPGangsta_GoogleAuthenticator();
             if (empty($code) && strlen($code) != 6) {
                 return Response::error([], ErrorCode::Login, '请正确输入手机上Google验证码');
@@ -159,13 +161,22 @@ class LoginController extends Controller
     {
         // 创建谷歌验证码
         // 生成二维码
-        $ga     = new PHPGangsta_GoogleAuthenticator();
-        $secret = $ga->createSecret();
-
+        $ga        = new PHPGangsta_GoogleAuthenticator();
+        $secret    = $ga->createSecret();
         $qrCodeUrl = $ga->getQRCodeGoogleUrl('身份验证', $secret);
-
-        $oneCode = $ga->getCode($secret);//生成code
-
+        $oneCode   = $ga->getCode($secret);//生成code
+        DB::beginTransaction();
+        try {
+            $data = ["google_secret" => $secret];
+            if (Globals::checkRowExists(['fields' => 'google_secret'])) {
+                Globals::AddData($data);
+            } else {
+                Globals::EditData(['fields' => 'google_secret'], $data);
+            }
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+        }
         return Response::success([
             'secret'    => $secret,
             'qrCodeUrl' => $qrCodeUrl,
