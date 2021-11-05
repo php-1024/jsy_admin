@@ -48,7 +48,7 @@ class ApplyBuyController extends Controller
                 'end_time'       => $params['end_time'],// 结束申购时间
                 'code_status'    => $params['code_status'],// 申购码开关  0 关闭 1 开启
                 'code'           => $params['code'],// 申购码
-                'detail'         => $params['code'],// 项目详情
+                'detail'         => $params['detail'],// 项目详情
                 'status'         => "0",// 币种状态  0 关闭 1 开启
             ];
             ApplyBuySetup::AddData($data);
@@ -94,7 +94,7 @@ class ApplyBuyController extends Controller
                 'end_time'       => $params['end_time'],// 结束申购时间
                 'code_status'    => $params['code_status'],// 申购码开关  0 关闭 1 开启
                 'code'           => $params['code'],// 申购码
-                'detail'         => $params['code'],// 项目详情
+                'detail'         => $params['detail'],// 项目详情
                 'status'         => "0",// 币种状态  0 关闭 1 开启
             ];
             ApplyBuySetup::EditData(['id' => $id], $data);
