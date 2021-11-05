@@ -9,6 +9,7 @@ use App\Library\Tools;
 use App\Models\Admin;
 use App\Models\AdminLoginLog;
 use App\Models\AdminOperationLog;
+use App\Models\Globals;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cache;
@@ -19,6 +20,18 @@ use Ramsey\Uuid\Uuid;
 
 class LoginController extends Controller
 {
+
+    /**
+     * 检测系统是否开启了 google_token
+     * @param Request $request
+     * @return array
+     */
+    public function google_token(Request $request): array
+    {
+        $google_token = Globals::getValue(['fields' => 'google_token'], 'value');
+        return Response::success(['google_token' => $google_token]);
+    }
+
     /**
      * 登录
      * @param Request $request
@@ -36,19 +49,24 @@ class LoginController extends Controller
         $username = $request->get('username');
         $password = $request->get('password');
 
-        /**********谷歌验证码验证 start************/
-        $code = $request->get('code');//谷歌验证码
-        $secret = $request->get('secret');//扫码生成的秘钥
+        // 谷歌动态口令 0-关闭 1-开启
+        $google_token = Globals::getValue(['fields' => 'google_token'], 'value');
+        // 系统开启了
+        if ($google_token == "1") {
+            /**********谷歌验证码验证 start************/
+            $code   = $request->get('code');//谷歌验证码
+            $secret = $request->get('secret');//扫码生成的秘钥
 
-        $obj = new PHPGangsta_GoogleAuthenticator();
-        if (empty($code) && strlen($code) != 6){
-            return Response::error([], ErrorCode::Login,'请正确输入手机上Google验证码');
+            $obj = new PHPGangsta_GoogleAuthenticator();
+            if (empty($code) && strlen($code) != 6) {
+                return Response::error([], ErrorCode::Login, '请正确输入手机上Google验证码');
+            }
+            $res = $obj->verifyCode($secret, $code);
+            if (!$res) {
+                return Response::error([], ErrorCode::Login, '请正确输入手机上Google验证码');
+            }
+            /**********谷歌验证码验证 end************/
         }
-        $res = $obj->verifyCode($secret,$code);
-        if (!$res){
-            return Response::error([], ErrorCode::Login,'请正确输入手机上Google验证码');
-        }
-        /**********谷歌验证码验证 end************/
 
         // 密码加密处理
         $passwd = Tools::md5($password);
@@ -66,7 +84,7 @@ class LoginController extends Controller
             $info['refresh_time'] = time();
             Redis::select(1);
             $value = Redis::get($info['id']);
-            if ($value){
+            if ($value) {
                 Cache::forget($value);
                 Redis::del($info['id']);
             }
@@ -75,7 +93,7 @@ class LoginController extends Controller
                 // 单位秒
                 $time = 60 * 60 * 12;// 12 小时
                 Cache::add($token, $info, $time);
-                Redis::set($info['id'],(string)$token);
+                Redis::set($info['id'], (string)$token);
                 AdminLoginLog::AddData([
                     'account_id' => $info['id'],
                     'account'    => $info['account'],
@@ -141,7 +159,7 @@ class LoginController extends Controller
     {
         // 创建谷歌验证码
         // 生成二维码
-        $ga = new PHPGangsta_GoogleAuthenticator();
+        $ga     = new PHPGangsta_GoogleAuthenticator();
         $secret = $ga->createSecret();
 
         $qrCodeUrl = $ga->getQRCodeGoogleUrl('身份验证', $secret);
@@ -149,7 +167,7 @@ class LoginController extends Controller
         $oneCode = $ga->getCode($secret);//生成code
 
         return Response::success([
-            'secret' => $secret,
+            'secret'    => $secret,
             'qrCodeUrl' => $qrCodeUrl,
         ]);
     }

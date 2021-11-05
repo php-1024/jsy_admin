@@ -14,6 +14,8 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'middleware' => 'admi
 
     // 登录 管理员
     Route::post('login', 'LoginController@login');
+    // 检测系统是否开启了 google_token
+    Route::get('google_token', 'LoginController@google_token');
     // 退出
     Route::post('logout', 'LoginController@logout');
     // 清除服务器上的所有Cache缓存

@@ -24,6 +24,7 @@ class Admin
         App::setLocale('zh-CN');
         $route = $request->path();
         switch ($route) {
+            case 'api/admin/google_token';
             case 'api/admin/login';
             case 'api/admin/flush';
             case 'api/admin/upload_images';
