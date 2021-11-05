@@ -77,7 +77,9 @@ class ApplyBuyController extends Controller
             return Response::error([], ErrorCode::MLG_Error, '请选择要编辑的币种，id未传输');
         }
         if ($params['code_status']) {
-            return Response::error([], ErrorCode::MLG_Error, '请设置申购码');
+            if (strlen($params['code']) <= 0) {
+                return Response::error([], ErrorCode::MLG_Error, '请设置申购码');
+            }
         }
         if ($check && $id != $check['id']) {
             return Response::error([], ErrorCode::MLG_Error, '申购币种名称已存在，请重新设置其他名称');
