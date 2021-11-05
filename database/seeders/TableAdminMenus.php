@@ -241,7 +241,7 @@ class TableAdminMenus extends Seeder
             ),
             array(
                 'id'         => 28,
-                'is_hidden'  => '4',                            // 是否显示 0否 1是
+                'is_hidden'  => '1',                            // 是否显示 0否 1是
                 'type'       => '2',                            // 类型，1目录  2菜单 3按钮 4接口
                 'parent_id'  => '5',                            // 父级id
                 'icon'       => '',                             // 菜单图标，按钮图标为空
