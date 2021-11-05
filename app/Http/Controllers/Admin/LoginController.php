@@ -176,6 +176,7 @@ class LoginController extends Controller
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
+            return Response::error([], ErrorCode::Login, '生成二维码失败');
         }
         return Response::success([
             'secret'    => $secret,
