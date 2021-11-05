@@ -50,10 +50,10 @@ class GlobalSet extends FormRequest
             'erc20_wallet_address' => 'string|between:1,300',             // 钱包收款地址
             'trc20_wallet_address' => 'string|between:1,300',             // 钱包收款地址
             'google_token'         => 'string|in:0,1',                    // 谷歌动态口令 0-关闭 1-开启
-            'ios_version'          => 'string|between:1,300',             // IOS版本号及下载地址
-            'ios_url'              => 'string|between:1,300',             // IOS版本号及下载地址
-            'android_version'      => 'string|between:1,300',             // 安卓版本号及下载地址
-            'android_url'          => 'string|between:1,300',             // 安卓版本号及下载地址
+            'ios_version'          => 'nullable|string|between:1,300',             // IOS版本号及下载地址
+            'ios_url'              => 'nullable|string|between:1,300',             // IOS版本号及下载地址
+            'android_version'      => 'nullable|string|between:1,300',             // 安卓版本号及下载地址
+            'android_url'          => 'nullable|string|between:1,300',             // 安卓版本号及下载地址
         ];
     }
 
