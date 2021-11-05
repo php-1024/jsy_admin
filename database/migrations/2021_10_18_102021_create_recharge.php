@@ -23,6 +23,7 @@ class CreateRecharge extends Migration
             $table->tinyInteger('type')->nullable()->comment('币链类型：1-OMNI  2-ERC20  3-TRC20');
             $table->tinyInteger('trading_pair_id')->nullable()->comment('充值的交易对id');
             $table->string('trading_pair_name')->nullable()->comment('充值的交易对name');
+            $table->tinyInteger('trading_pair_type')->nullable()->comment('1现货 2合约');
             $table->string('recharge_num')->nullable()->comment('充值数量');
             $table->enum('status', [0, 1])->nullable()->comment('状态：0-未确认：1-已确认');
             $table->dateTime('created_at')->default(date('Y-m-d H:i:s'))->comment('创建时间');
