@@ -34,7 +34,9 @@ class ApplyBuyController extends Controller
             return Response::error([], ErrorCode::MLG_Error, '申购币种名称已存在');
         }
         if ($params['code_status']) {
-            return Response::error([], ErrorCode::MLG_Error, '请设置申购码');
+            if (strlen($params['code']) <= 0) {
+                return Response::error([], ErrorCode::MLG_Error, '请设置申购码');
+            }
         }
         DB::beginTransaction();
         try {
