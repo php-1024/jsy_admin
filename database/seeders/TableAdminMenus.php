@@ -201,32 +201,6 @@ class TableAdminMenus extends Seeder
                 'updated_at' => date('Y-m-d H:i:s'),     // 更新时间
             ),
             array(
-                'id'         => 23,
-                'is_hidden'  => '1',                            // 是否显示 0否 1是
-                'type'       => '2',                            // 类型，1目录  2菜单 3按钮 4接口
-                'parent_id'  => '2',                            // 父级id
-                'icon'       => '',                             // 菜单图标，按钮图标为空
-                'sort'       => 0,                              // 排序值，数字越大越后面
-                'name'       => 'help_manage',                  // 菜单name
-                'cname'      => '帮助管理',                      // 菜单中文名
-                'path_views' => '/system/help_manage',          // 路径
-                'created_at' => date('Y-m-d H:i:s'),     // 创建时间
-                'updated_at' => date('Y-m-d H:i:s'),     // 更新时间
-            ),
-            array(
-                'id'         => 24,
-                'is_hidden'  => '1',                            // 是否显示 0否 1是
-                'type'       => '2',                            // 类型，1目录  2菜单 3按钮 4接口
-                'parent_id'  => '2',                            // 父级id
-                'icon'       => '',                             // 菜单图标，按钮图标为空
-                'sort'       => 0,                              // 排序值，数字越大越后面
-                'name'       => 'news_manage',                  // 菜单name
-                'cname'      => '新闻管理',                      // 菜单中文名
-                'path_views' => '/system/news_manage',          // 路径
-                'created_at' => date('Y-m-d H:i:s'),     // 创建时间
-                'updated_at' => date('Y-m-d H:i:s'),     // 更新时间
-            ),
-            array(
                 'id'         => 25,
                 'is_hidden'  => '1',                            // 是否显示 0否 1是
                 'type'       => '2',                            // 类型，1目录  2菜单 3按钮 4接口
@@ -267,13 +241,13 @@ class TableAdminMenus extends Seeder
             ),
             array(
                 'id'         => 28,
-                'is_hidden'  => '1',                            // 是否显示 0否 1是
+                'is_hidden'  => '4',                            // 是否显示 0否 1是
                 'type'       => '2',                            // 类型，1目录  2菜单 3按钮 4接口
                 'parent_id'  => '5',                            // 父级id
                 'icon'       => '',                             // 菜单图标，按钮图标为空
                 'sort'       => 3,                              // 排序值，数字越大越后面
                 'name'       => 'currency_transaction',              // 菜单name
-                'cname'      => '币币交易',                      // 菜单中文名
+                'cname'      => '现货交易列表',                      // 菜单中文名
                 'path_views' => '/currency/currency_transaction',// 路径
                 'created_at' => date('Y-m-d H:i:s'),     // 创建时间
                 'updated_at' => date('Y-m-d H:i:s'),     // 更新时间
