@@ -172,9 +172,9 @@ class LoginController extends Controller
                 'value'  => $secret
             ];
             if (Globals::checkRowExists(['fields' => 'google_secret'])) {
-                Globals::AddData($data);
-            } else {
                 Globals::EditData(['fields' => 'google_secret'], $data);
+            } else {
+                Globals::AddData($data);
             }
             DB::commit();
         } catch (\Exception $e) {
