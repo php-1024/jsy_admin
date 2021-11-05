@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Exceptions\ErrorCode;
 use App\Http\Requests\Admin\Id;
+use App\Http\Requests\Admin\RiskProfit;
 use App\Http\Requests\Admin\UserEdit;
 use App\Http\Requests\Admin\UserGetSub;
 use App\Http\Requests\Admin\UserGrade;
@@ -135,6 +136,31 @@ class UserController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             AdminOperationLog::Info($request, "编辑用户状态失败", $e->getMessage());
+            return Response::error([], ErrorCode::MLG_Error);
+        }
+        return Response::success();
+    }
+
+    /**
+     * 编辑用户风控
+     * @param RiskProfit $request
+     * @return array
+     * @throws \Throwable
+     */
+    public function risk_profit(RiskProfit $request): array
+    {
+        $id        = $request->get('id');
+        $edit_data = [
+            'risk_profit' => $request->get("risk_profit")
+        ];
+        DB::beginTransaction();
+        try {
+            User::EditData(['id' => $id], $edit_data);
+            AdminOperationLog::Info($request, "编辑了用户id：{$id}，风控制为：{$edit_data['risk_profit']}");
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            AdminOperationLog::Info($request, "编辑用户风控失败", $e->getMessage());
             return Response::error([], ErrorCode::MLG_Error);
         }
         return Response::success();

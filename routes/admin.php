@@ -98,6 +98,8 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'middleware' => 'admi
         Route::post('edit', 'UserController@edit');
         // 修改用户状态
         Route::post('status', 'UserController@status');
+        // 设置风控
+        Route::post('risk_profit', 'UserController@risk_profit');
         // 用户等级设置
         Route::post('grade_setup', 'UserController@grade_setup');
         // 获取下级信息
