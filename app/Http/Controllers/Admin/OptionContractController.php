@@ -9,6 +9,7 @@ use App\Http\Requests\Admin\OptionContractAdd;
 use App\Http\Requests\Admin\OptionContractEdit;
 use App\Library\Response;
 use App\Models\AdminOperationLog;
+use App\Models\ApplyBuySetup;
 use App\Models\OptionContract;
 use App\Models\PerpetualContract;
 use Illuminate\Http\Request;
@@ -37,6 +38,34 @@ class OptionContractController extends Controller
             return Response::error([], ErrorCode::MLG_Error);
         }
         return Response::success($option_contract);
+    }
+
+    /**
+     * 状态修改
+     * @param Id $request
+     * @return array
+     * @throws \Throwable
+     */
+    public function status(Id $request): array
+    {
+        $id             = $request->get('id');
+        $where          = ['id' => $id];
+        $OptionContract = OptionContract::getOne($where);
+        DB::beginTransaction();
+        try {
+            if ($OptionContract['status']) {
+                OptionContract::EditData($where, ['status' => '0']);
+            } else {
+                OptionContract::EditData($where, ['status' => '1']);
+            }
+            AdminOperationLog::Info($request, "期权合约：{$id} 的状态变更了");
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            AdminOperationLog::Info($request, "期权合约状态修改失败", $e->getMessage());
+            return Response::error([], ErrorCode::MLG_Error, $e->getMessage());
+        }
+        return Response::success();
     }
 
     /**

@@ -157,6 +157,8 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'middleware' => 'admi
         Route::group(['prefix' => 'option_contract'], function () {
             // 添加
             Route::post('add', 'OptionContractController@add');
+            // 状态修改
+            Route::post('status', 'OptionContractController@status');
             // 编辑
             Route::post('edit', 'OptionContractController@edit');
             // 列表
