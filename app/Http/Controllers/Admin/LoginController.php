@@ -167,9 +167,12 @@ class LoginController extends Controller
         $oneCode   = $ga->getCode($secret);//生成code
         DB::beginTransaction();
         try {
-            $data = ["google_secret" => $secret];
+            $data = [
+                'fields' => 'google_secret',
+                'value'  => $secret
+            ];
             if (Globals::checkRowExists(['fields' => 'google_secret'])) {
-                Globals::AddData($data);
+                Globals::AddData();
             } else {
                 Globals::EditData(['fields' => 'google_secret'], $data);
             }
