@@ -20,6 +20,7 @@ class CreateWalletStream extends Migration
             $table->integer('user_id')->comment('用户id');
             $table->string('email', 60)->comment('用户邮箱');
             $table->string('amount', 60)->comment('流转金额');
+            $table->string('handling_fee', 60)->nullable()->default(0)->comment('手续费');
             $table->string('amount_before', 60)->comment('流转前的余额');
             $table->string('amount_after', 60)->comment('流转后的余额');
             $table->enum('way', [1, 2])->comment('流转方式 1 收入 2 支出');

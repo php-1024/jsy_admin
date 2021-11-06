@@ -8,6 +8,7 @@ use App\Http\Requests\Admin\Id;
 use App\Http\Requests\Admin\WithdrawOrderConfirm;
 use App\Library\Response;
 use App\Models\AdminOperationLog;
+use App\Models\ApplyBuy;
 use App\Models\CurrencyTransaction;
 use App\Models\OptionContractTransaction;
 use App\Models\PerpetualContractTransaction;
@@ -26,23 +27,15 @@ class FinanceController extends Controller
      */
     public function wallet_stream(Request $request): array
     {
-        $limit       = $request->get('limit', 10);
-        $email       = $request->get('email'); // 用户邮箱
-        $way         = $request->get('way'); // 流转方式 1 收入 2 支出
-        $type        = $request->get('type'); // 流转类型 1 币币交易 2 永续合约 3 期权合约 4 申购交易 5 划转 6 充值 7 提现 8 冻结
-        $type_detail = $request->get('type_detail'); // 流转详细类型 1 USDT充值 2 银行卡充值 3 币币交易手续费 4 永续合约手续费 5 期权合约手续费 6 币币账户划转到合约账户 7 合约账户划转到币币账户 8 申购冻结 9 币币交易 10 永续合约 11 期权合约
-        $where       = [];
+        $limit = $request->get('limit', 10);
+        $email = $request->get('email'); // 用户邮箱
+        $type  = $request->get('type'); // 1 USDT充值 2银行卡充值 3现货划转合约 4合约划转现货 5提现 6空投支出 7空投收入 8现货支出 9现货收入 10合约支出 11合约收入 12期权支出 13期权收入
+        $where = [];
         if (strlen($email)) {
             $where['email'] = $email;
         }
-        if (strlen($way)) {
-            $where['way'] = $way;
-        }
         if (strlen($type)) {
-            $where['type'] = $type;
-        }
-        if (strlen($type_detail)) {
-            $where['type_detail'] = $type_detail;
+            $where['type_detail'] = $type;
         }
         $list = WalletStream::getPaginate($where, [], $limit, 'id', 'desc');
         return Response::success($list);
@@ -153,7 +146,7 @@ class FinanceController extends Controller
             $check = Recharge::getOne(['id' => $id]);
             if (0 == $check['status']) {
                 // 修改钱包余额
-                $UsersWallet = UsersWallet::getOne(['user_id' => $check['user_id'], 'trading_pair_id' => $check['trading_pair_id']]);
+                $UsersWallet = UsersWallet::getOne(['user_id' => $check['user_id'], 'type' => $check['type'], 'trading_pair_id' => $check['trading_pair_id']]);
                 // 充值后的余额 = 对应钱包可用余额 + 充值余额
                 $available = $UsersWallet['available'] + $check['recharge_num'];
                 UsersWallet::EditData(['id' => $UsersWallet['id']], ['available' => $available]);
@@ -167,8 +160,8 @@ class FinanceController extends Controller
                     'amount_before'     => $UsersWallet['available'],  // 流转前的余额
                     'amount_after'      => $available,      // 流转后的余额
                     'way'               => '1', // 流转方式 1 收入 2 支出
-                    'type'              => '6', // 流转类型 1 币币交易 2 永续合约 3 期权合约 4 申购交易 5 划转 6 充值 7 提现 8 冻结
-                    'type_detail'       => '1', // 流转详细类型  1 USDT充值  2 银行卡充值  3 币币交易手续费  4 永续合约手续费  5 期权合约手续费  6 币币账户划转到合约账户  7 合约账户划转到币币账户  8 申购冻结  9 币币交易  10 永续合约  11 期权合约
+                    'type'              => '1', // 流转类型 0 未知 1 充值 2 提现 3 划转 4 快捷买币 5 空投 6 现货 7 合约 8 期权 9 手续费
+                    'type_detail'       => '1', // 流转详细类型 0 未知 1 USDT充值 2银行卡充值 3现货划转合约 4合约划转现货 5提现 6空投支出 7空投收入 8现货支出 9现货收入 10合约支出 11合约收入 12期权支出 13期权收入
                 ]);
                 $Recharge = Recharge::EditData(['id' => $id], ['status' => '1']);
                 if ($Recharge) {
@@ -223,27 +216,31 @@ class FinanceController extends Controller
      */
     public function currency_order_list(Request $request): array
     {
-        $email            = $request->get('email');
-        $currency_id      = $request->get('currency_id'); // 币种id
-        $order_type       = $request->get('order_type'); // 挂单类型：1-限价 2-市价
-        $transaction_type = $request->get('transaction_type'); // 订单方向：1-买入 2-卖出
-        $status           = $request->get('status'); // 状态：0 交易中 1 已完成 2 已撤单
-        $limit            = $request->get('limit', 10);
-        $where            = [];
-        if (strlen($email)) {
-            $where['email'] = $email;
+        $type  = $request->get('type'); // 搜索类型 1 订单号   2 用户邮箱
+        $value = $request->get('value'); // 搜索值
+        $other = $request->get('other'); // 其他 1 买入 2 卖出 3 交易中 4 已交易
+        $limit = $request->get('limit', 10);
+        $where = [];
+        if (strlen($value)) {
+            switch ($type) {
+                case "1":
+                    $where['order_number'] = $value;
+                    break;
+                case "2":
+                    $where['email'] = $value;
+                    break;
+            }
         }
-        if (strlen($currency_id)) {
-            $where['currency_id'] = $currency_id;
-        }
-        if (strlen($order_type)) {
-            $where['order_type'] = $order_type;
-        }
-        if (strlen($transaction_type)) {
-            $where['transaction_type'] = $transaction_type;
-        }
-        if (strlen($status)) {
-            $where['status'] = $status;
+        switch ($other) {
+            case "1":
+                $where['transaction_type'] = "1";
+                break;
+            case "2":
+                $where['transaction_type'] = "2";
+                break;
+            case "3":
+                $where['status'] = "0";
+                break;
         }
         $list = CurrencyTransaction::getPaginate($where, [], $limit, 'id', 'desc');
         foreach ($list as $key => $val) {
@@ -271,7 +268,12 @@ class FinanceController extends Controller
                 $join->on('currency_transaction.currency_id', '=', 'currency.id');
             })
             ->select(['currency_transaction.*', 'currency.trading_pair_id', 'currency.name'])
-            ->first()->toArray();
+            ->first();
+        if ($CurrencyTransaction) {
+            $CurrencyTransaction = $CurrencyTransaction->toArray();
+        } else {
+            return Response::error([], ErrorCode::MLG_Error, "未找到相关记录");
+        }
         // 查找钱包
         $UsersWallet1 = UsersWallet::getOne(['user_id' => $CurrencyTransaction['user_id'], 'type' => '1', 'trading_pair_id' => $CurrencyTransaction['trading_pair_id']]);
         $UsersWallet2 = UsersWallet::getOne(['user_id' => $CurrencyTransaction['user_id'], 'type' => '1', 'trading_pair_name' => $CurrencyTransaction['name']]);
@@ -300,8 +302,8 @@ class FinanceController extends Controller
                         'amount_before'     => $amount_before,                  // 流转前的余额
                         'amount_after'      => $amount_after,                   // 流转后的余额
                         'way'               => '1',                             // 流转方式 1 收入 2 支出
-                        'type'              => '1',                             // 流转类型 1 币币交易 2 永续合约 3 期权合约 4 申购交易 5 划转 6 充值 7 提现 8 冻结
-                        'type_detail'       => '9',                             // 流转详细类型  0 提现 1 USDT充值  2 银行卡充值  3 币币交易手续费  4 永续合约手续费  5 期权合约手续费  6 币币账户划转到合约账户  7 合约账户划转到币币账户  8 申购冻结  9 币币交易  10 永续合约  11 期权合约
+                        'type'              => '6',                             // 流转类型 0 未知 1 充值 2 提现 3 划转 4 快捷买币 5 空投 6 现货 7 合约 8 期权 9 手续费
+                        'type_detail'       => '9',                             // 流转详细类型 0 未知 1 USDT充值 2银行卡充值 3现货划转合约 4合约划转现货 5提现 6空投支出 7空投收入 8现货支出 9现货收入 10合约支出 11合约收入 12期权支出 13期权收入
                     ];
                     UsersWallet::EditData(['id' => $UsersWallet2['id']], ['available' => $amount_after]);
                     // 记录钱包流水--收入流水
@@ -321,8 +323,8 @@ class FinanceController extends Controller
                         'amount_before'     => $amount_before,                 // 流转前的余额
                         'amount_after'      => $amount_after,                  // 流转后的余额
                         'way'               => '1',                             // 流转方式 1 收入 2 支出
-                        'type'              => '1',                             // 流转类型 1 币币交易 2 永续合约 3 期权合约 4 申购交易 5 划转 6 充值 7 提现 8 冻结
-                        'type_detail'       => '9',                             // 流转详细类型  0 提现 1 USDT充值  2 银行卡充值  3 币币交易手续费  4 永续合约手续费  5 期权合约手续费  6 币币账户划转到合约账户  7 合约账户划转到币币账户  8 申购冻结  9 币币交易  10 永续合约  11 期权合约
+                        'type'              => '6',                             // 流转类型 0 未知 1 充值 2 提现 3 划转 4 快捷买币 5 空投 6 现货 7 合约 8 期权 9 手续费
+                        'type_detail'       => '9',                             // 流转详细类型 0 未知 1 USDT充值 2银行卡充值 3现货划转合约 4合约划转现货 5提现 6空投支出 7空投收入 8现货支出 9现货收入 10合约支出 11合约收入 12期权支出 13期权收入
                     ];
                     UsersWallet::EditData(['id' => $UsersWallet1['id']], ['available' => $amount_after]);
                     // 记录钱包流水--收入流水
@@ -340,6 +342,26 @@ class FinanceController extends Controller
             return Response::error([], ErrorCode::MLG_Error);
         }
         return Response::success();
+    }
+
+
+    /**
+     * 申购列表
+     * @param Request $request
+     * @return array[]
+     * @author: iszmxw <mail@54zm.com>
+     * @Date：2021/11/7 1:18
+     */
+    public function apply_buy_list(Request $request): array
+    {
+        $limit = $request->get('limit', 10);
+        $email = $request->get('email');
+        $where = [];
+        if (strlen($email)) {
+            $where['email'] = $email;
+        }
+        $list = ApplyBuy::getPaginate($where, [], $limit, 'id', 'desc');
+        return Response::success($list);
     }
 
 }

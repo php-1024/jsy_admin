@@ -206,6 +206,8 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'middleware' => 'admi
         Route::post('currency_order_list', 'FinanceController@currency_order_list');
         // 币币交易订单状态操作
         Route::post('currency_order_confirm', 'FinanceController@currency_order_confirm');
+        // 申购列表
+        Route::post('apply_buy_list', 'FinanceController@apply_buy_list');
     });
     // 登录 创建谷歌验证码
     Route::get('create_google_code', 'LoginController@create_google_code');
