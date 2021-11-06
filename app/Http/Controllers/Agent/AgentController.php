@@ -4,12 +4,17 @@ namespace App\Http\Controllers\Agent;
 
 use App\Exceptions\ErrorCode;
 use App\Http\Requests\Admin\Id;
+use App\Http\Requests\Admin\RiskProfit;
+use App\Http\Requests\Admin\UserId;
+use App\Http\Requests\Admin\UserWalletList;
 use App\Http\Requests\Agent\UserEdit;
 use App\Library\Response;
 use App\Library\Tools;
+use App\Models\AdminOperationLog;
 use App\Models\Recharge;
 use App\Models\User;
 use App\Models\UsersWallet;
+use App\Models\WalletAddress;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
@@ -24,7 +29,7 @@ class AgentController extends Controller
 //        $info                = $request->get('info');
 //        $where['user_level'] = $info['user_level'] + 1;
 //        $ids                 = User::where('user_path', 'like', "%{$info['sub_user_path']}%")->where($where)->pluck('id')->toArray();
-        $today               = date('Y-m-d 00:00:00');
+//        $today = date('Y-m-d 00:00:00');
 //        Recharge::whereIn('id', $ids)->where('created_at', '>=', $today)->count('recharge_num');
 //        $data = [
 //            // 全内用户
@@ -56,20 +61,39 @@ class AgentController extends Controller
      */
     public function user_manage(Request $request): array
     {
-        $limit               = $request->get('limit', 10);
-        $info                = $request->get('info');
-        $where               = [];
-        $like                = ['user_path' => $info['sub_user_path']];
-        $email               = $request->get('email');
-        $is_agent            = $request->get('is_agent');
-        $where['user_level'] = $info['user_level'] + 1;
-        if (strlen($email)) {
-            $where['email'] = $email;
+        $limit              = $request->get('limit', 10);
+        $info               = $request->get('info');
+        $where              = [];
+        $where['parent_id'] = $info['id'];
+        $type               = $request->get('type');
+        $value              = $request->get('value');
+        $other              = $request->get('other');
+        if (strlen($value)) {
+            switch ($type) {
+                case "1": // 用户邮箱
+                    $where['email'] = (string)$value;
+                    break;
+                case "2": // 上级代理
+                    $where['parent_id'] = (string)$value;
+                    break;
+                case "3": // 用户邀请码
+                    $where['share_code'] = (string)$value;
+                    break;
+            }
         }
-        if (strlen($is_agent)) {
-            $where['is_agent'] = $is_agent;
+        if (strlen($other)) {
+            switch ($other) {
+                case "1": // 代理
+                    $where['is_agent'] = '1';
+                    break;
+                case "2": // 锁定
+                    $where['status'] = '1';
+                    break;
+                default:
+                    break;
+            }
         }
-        $list = User::getAgentPaginate($where, $like, [], $limit, 'id', 'desc');
+        $list = User::getAgentPaginate($where, [], $limit, 'id', 'desc');
         return Response::success($list);
     }
 
@@ -139,6 +163,37 @@ class AgentController extends Controller
     }
 
     /**
+     * 编辑用户风控
+     * @param RiskProfit $request
+     * @return array
+     * @throws \Throwable
+     */
+    public function risk_profit(RiskProfit $request): array
+    {
+        $id    = $request->get('id');
+        $info  = $request->get('info');
+        $user  = User::getOne(['id' => $id]);
+        $check = strpos($user['user_path'], $info['sub_user_path']);
+        if ($check === false) {
+            return Response::error([], ErrorCode::MLG_Error, "权限不足，请检查该用户是否是您的下级");
+        }
+        $edit_data = [
+            'risk_profit' => $request->get("risk_profit")
+        ];
+        DB::beginTransaction();
+        try {
+            User::EditData(['id' => $id], $edit_data);
+            AdminOperationLog::Info($request, "编辑了用户id：{$id}，风控制为：{$edit_data['risk_profit']}");
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            AdminOperationLog::Info($request, "编辑用户风控失败", $e->getMessage());
+            return Response::error([], ErrorCode::MLG_Error);
+        }
+        return Response::success();
+    }
+
+    /**
      * 查看下级用户
      * @param Id $request
      * @return array
@@ -172,8 +227,7 @@ class AgentController extends Controller
         $id             = $request->get('id');
         $info           = $request->get('info');
         $password       = $request->get('password');
-        $risk_profit    = $request->get('risk_profit');
-        $partner_level  = $request->get('partner_level');
+        $pay_password   = $request->get('pay_password');
         $agent_dividend = $request->get('agent_dividend');
         $user           = User::getOne(['id' => $id]);
         $check          = strpos($user['user_path'], $info['sub_user_path']);
@@ -184,11 +238,8 @@ class AgentController extends Controller
         if (strlen($password)) {
             $edit_data['password'] = Tools::md5($password);
         }
-        if (strlen($risk_profit)) {
-            $edit_data['risk_profit'] = $risk_profit;
-        }
-        if (strlen($partner_level)) {
-            $edit_data['partner_level'] = $partner_level;
+        if (strlen($pay_password)) {
+            $edit_data['pay_password'] = Tools::md5($pay_password);
         }
         if (strlen($agent_dividend)) {
             $edit_data['agent_dividend'] = $agent_dividend;
@@ -207,19 +258,39 @@ class AgentController extends Controller
 
     /**
      * 钱包列表
-     * @param Id $request
+     * @param UserWalletList $request
      * @return array
+     * @author: iszmxw <mail@54zm.com>
+     * @Date：2021/11/6 23:34
      */
-    public function wallet_list(Id $request): array
+    public function wallet_list(UserWalletList $request): array
     {
-        $id    = $request->get('id');
-        $info  = $request->get('info');
-        $user  = User::getOne(['id' => $id]);
-        $check = strpos($user['user_path'], $info['sub_user_path']);
+        $user_id = $request->get('user_id');
+        $type    = $request->get('type');
+        $info    = $request->get('info');
+        $user    = User::getOne(['id' => $user_id]);
+        $check   = strpos($user['user_path'], $info['sub_user_path']);
         if ($check === false) {
             return Response::error([], ErrorCode::MLG_Error, "权限不足，请检查该用户是否是您的下级");
         }
-        $list = UsersWallet::where(['user_id' => $id])->get()->toArray();
+        $list = UsersWallet::where([
+            'user_id' => $user_id,
+            'type'    => $type,
+        ])->get()->toArray();
         return Response::success($list);
     }
+
+    /**
+     * 提币地址
+     * @param UserId $request
+     * @return array[]
+     */
+    public function wallet_address(UserId $request): array
+    {
+        $user_id = $request->get('user_id');
+        $list    = WalletAddress::getList(['user_id' => $user_id]);
+        return Response::success($list);
+    }
+
+
 }

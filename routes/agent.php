@@ -23,22 +23,22 @@ Route::group(['prefix' => 'agent', 'namespace' => 'Agent', 'middleware' => 'agen
 
     // 用户管理
     Route::group(['prefix' => 'user'], function () {
-//        // 提币地址
-//        Route::post('withdraw_address', 'AgentController@withdraw_address');
-//        // 风险设置
-//        Route::post('risk_setup', 'AgentController@risk_setup');
+        // 用户列表
+        Route::post('user_manage', 'AgentController@user_manage');
         // 代理开关
         Route::post('is_agent', 'AgentController@is_agent');
         // 锁定
         Route::post('status', 'AgentController@status');
-        // 用户列表
-        Route::post('user_manage', 'AgentController@user_manage');
         // 修改用户信息
         Route::post('edit', 'AgentController@edit');
         // 查看下级用户
         Route::post('sub_detail', 'AgentController@sub_detail');
-        // 钱包列表
+        // 设置风控
+        Route::post('risk_profit', 'AgentController@risk_profit');
+        // 资产列表
         Route::post('wallet_list', 'AgentController@wallet_list');
+        // 提币地址
+        Route::post('wallet_address', 'AgentController@wallet_address');
     });
 
     // 财务管理

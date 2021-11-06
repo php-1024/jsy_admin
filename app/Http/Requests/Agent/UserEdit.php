@@ -39,8 +39,7 @@ class UserEdit extends FormRequest
         return [
             'id'             => 'required|numeric',
             'password'       => 'nullable|string|between:6,10',
-            'risk_profit'    => 'nullable|numeric',
-            'partner_level'  => 'nullable|in:0,1,2,3,4', // 0-普通 1-青铜 2-白银 3-黄金 4-铂金
+            'pay_password'   => 'nullable|string|between:6,10',
             'agent_dividend' => 'nullable|numeric',
         ];
     }

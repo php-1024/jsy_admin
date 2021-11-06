@@ -84,7 +84,7 @@ class User extends Base
 //        }
 //    }
     // 代理后台获取分页获取数据
-    public static function getAgentPaginate($where = [], $like = [], $field = [], $paginate = 1, $orderby = "", $sort = "DESC")
+    public static function getAgentPaginate($where = [], $field = [], $paginate = 1, $orderby = "", $sort = "DESC")
     {
         if (empty($field)) {
             $field = '*';
@@ -92,11 +92,6 @@ class User extends Base
         $model = self::select($field);
         if (!empty($where)) {
             $model = $model->where($where);
-        }
-        if (!empty($like)) {
-            foreach ($like as $key => $val) {
-                $model = $model->where($key, 'like', "%{$val}%");
-            }
         }
         if (!empty($orderby)) {
             $model = $model->orderBy($orderby, $sort);
@@ -117,7 +112,7 @@ class User extends Base
 
 
     // 获取代理列表数据
-    public static function getAgentList($where = [], $like = [],$field = [], $offset = 0, $limit = 0, $orderby = "", $sort = 'DESC')
+    public static function getAgentList($where = [], $like = [], $field = [], $offset = 0, $limit = 0, $orderby = "", $sort = 'DESC')
     {
         if (empty($field)) {
             $field = '*';
