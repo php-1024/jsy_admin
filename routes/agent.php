@@ -53,6 +53,8 @@ Route::group(['prefix' => 'agent', 'namespace' => 'Agent', 'middleware' => 'agen
         Route::post('option_contract_transaction', 'FinanceController@option_contract_transaction');
         // 永续交易列表
         Route::post('perpetual_contract_transaction', 'FinanceController@perpetual_contract_transaction');
+        // 申购列表
+        Route::post('apply_buy_list', 'FinanceController@apply_buy_list');
     });
 
 });

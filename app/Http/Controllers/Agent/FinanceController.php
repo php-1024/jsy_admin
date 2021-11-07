@@ -6,8 +6,10 @@ use App\Http\Requests\Agent\RechargeOrder;
 use App\Http\Requests\Agent\WalletStream;
 use App\Http\Requests\Agent\Email;
 use App\Library\Response;
+use App\Models\ApplyBuy;
 use App\Models\User;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 
 class FinanceController extends Controller
 {
@@ -19,24 +21,16 @@ class FinanceController extends Controller
      */
     public function wallet_stream(WalletStream $request): array
     {
-        $email       = $request->get('email');
-        $way         = $request->get('way'); // 流转方式 1 收入 2 支出
-        $type        = $request->get('type');
-        $type_detail = $request->get('type_detail');
-        $limit       = $request->get('limit', 10);
-        $info        = $request->get('info');
-        $where       = [];
+        $limit = $request->get('limit', 10);
+        $info  = $request->get('info');
+        $email = $request->get('email'); // 用户邮箱
+        $type  = $request->get('type'); // 1 USDT充值 2银行卡充值 3现货划转合约 4合约划转现货 5提现 6空投支出 7空投收入 8现货支出 9现货收入 10合约支出 11合约收入 12期权支出 13期权收入
+        $where = [];
         if (strlen($email)) {
             $where['email'] = $email;
         }
-        if (strlen($way)) {
-            $where['way'] = $way;
-        }
         if (strlen($type)) {
-            $where['type'] = $type;
-        }
-        if (strlen($type_detail)) {
-            $where['type_detail'] = $type_detail;
+            $where['type_detail'] = $type;
         }
         $ids  = User::where('user_path', 'like', "%{$info['sub_user_path']}%")->where(['user_level' => $info['user_level'] + 1])->pluck('id')->toArray();
         $list = \App\Models\WalletStream::whereIn('user_id', $ids)
@@ -136,6 +130,31 @@ class FinanceController extends Controller
         }
         $ids  = User::where('user_path', 'like', "%{$info['sub_user_path']}%")->where(['user_level' => $info['user_level'] + 1])->pluck('id')->toArray();
         $list = \App\Models\PerpetualContractTransaction::whereIn('user_id', $ids)
+            ->where($where)
+            ->orderBy('id', 'desc')
+            ->paginate($limit);
+        return Response::success($list);
+    }
+
+
+    /**
+     * 申购列表
+     * @param Request $request
+     * @return array
+     * @author: iszmxw <mail@54zm.com>
+     * @Date：2021/11/7 23:02
+     */
+    public function apply_buy_list(Request $request): array
+    {
+        $limit = $request->get('limit', 10);
+        $email = $request->get('email');
+        $where = [];
+        if (strlen($email)) {
+            $where['email'] = $email;
+        }
+        $info = $request->get('info');
+        $ids  = User::where('user_path', 'like', "%{$info['sub_user_path']}%")->where(['user_level' => $info['user_level'] + 1])->pluck('id')->toArray();
+        $list = \App\Models\ApplyBuy::whereIn('user_id', $ids)
             ->where($where)
             ->orderBy('id', 'desc')
             ->paginate($limit);

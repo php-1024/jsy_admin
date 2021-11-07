@@ -16,6 +16,7 @@ class CreateApplyBuy extends Migration
     {
         Schema::create('apply_buy', function (Blueprint $table) {
             $table->increments('id')->comment('主键id');
+            $table->integer('user_id')->comment('用户id');
             $table->string('email')->comment('申购用户');
             $table->integer('get_currency_id')->comment('购买币种id');
             $table->string('get_currency_name')->nullable()->comment('购买币种名称');
