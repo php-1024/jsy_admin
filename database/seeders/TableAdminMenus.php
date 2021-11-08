@@ -243,7 +243,7 @@ class TableAdminMenus extends Seeder
                 'id'         => 28,
                 'is_hidden'  => '1',                            // 是否显示 0否 1是
                 'type'       => '2',                            // 类型，1目录  2菜单 3按钮 4接口
-                'parent_id'  => '5',                            // 父级id
+                'parent_id'  => '4',                            // 父级id
                 'icon'       => '',                             // 菜单图标，按钮图标为空
                 'sort'       => 3,                              // 排序值，数字越大越后面
                 'name'       => 'currency_transaction',              // 菜单name
@@ -264,6 +264,19 @@ class TableAdminMenus extends Seeder
                 'path_views' => '/currency/apply_buy',           // 路径
                 'created_at' => date('Y-m-d H:i:s'),      // 创建时间
                 'updated_at' => date('Y-m-d H:i:s'),      // 更新时间
+            ),
+            array(
+                'id'         => 30,
+                'is_hidden'  => '1',                            // 是否显示 0否 1是
+                'type'       => '2',                            // 类型，1目录  2菜单 3按钮 4接口
+                'parent_id'  => '4',                            // 父级id
+                'icon'       => '',                             // 菜单图标，按钮图标为空
+                'sort'       => 3,                              // 排序值，数字越大越后面
+                'name'       => 'apply_buy_list',              // 菜单name
+                'cname'      => '申购列表',                      // 菜单中文名
+                'path_views' => '/finance/apply_buy_list',      // 路径
+                'created_at' => date('Y-m-d H:i:s'),     // 创建时间
+                'updated_at' => date('Y-m-d H:i:s'),     // 更新时间
             ),
         ),
         );
