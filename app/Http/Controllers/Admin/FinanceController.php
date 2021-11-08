@@ -79,7 +79,7 @@ class FinanceController extends Controller
             if ($check == false) {
                 return Response::error([], ErrorCode::MLG_Error, "数据不存在！");
             }
-            if (0 == $check['status'] && 1 == $status) {// 状态为零的数据审核通过
+            if (0 == $check['status'] && $status > 0) {// 状态为零的数据审核通过
                 // 修改钱包余额
                 $UsersWallet = UsersWallet::getOne(['user_id' => $check['user_id'], 'trading_pair_id' => $check['trading_pair_id']]);
                 // 提现后的余额 = 对应钱包可用余额 + 提现金额
