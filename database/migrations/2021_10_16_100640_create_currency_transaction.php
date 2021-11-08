@@ -21,6 +21,7 @@ class CreateCurrencyTransaction extends Migration
             $table->string('order_number', 50)->unique("order_number")->comment('订单号');
             $table->integer('currency_id')->comment('币种');
             $table->string('currency_name', 100)->nullable()->comment('币种名称 例如：BTC/USDT（币种/交易对）');
+            $table->string('entrust_num', 100)->nullable()->comment('委托量');
             $table->enum('order_type', [1, 2])->comment('挂单类型：1-限价 2-市价');
             $table->string('limit_price', 100)->nullable()->comment('当前限价');
             $table->string('clinch_num', 100)->nullable()->comment('成交量');
