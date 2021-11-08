@@ -22,8 +22,13 @@ class TradingPairController extends Controller
     public function add(TradingPairAdd $request): array
     {
         $add_data = $request->all();
+        if (TradingPair::checkRowExists(['name' => $add_data['name']])) {
+            return Response::error([], ErrorCode::MLG_Error, "该交易对已经存在，请换个名称");
+        }
         DB::beginTransaction();
         try {
+            // 查询钱包
+
             // 添加数据
             $trading_pair = TradingPair::AddData($add_data, $add_data);
             AdminOperationLog::Info($request, "添加了交易对ID{$trading_pair['id']}");
