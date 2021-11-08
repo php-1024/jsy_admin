@@ -92,7 +92,21 @@ class UserController extends Controller
         $password       = $request->get('password');
         $pay_password   = $request->get('pay_password');
         $agent_dividend = $request->get('agent_dividend');
-        $edit_data      = [];
+        $user           = User::getOne(['id' => $id]);
+        if (empty($user)) {
+            return Response::error([], ErrorCode::MLG_Error, '用户不存在');
+        }
+        // 有上级用户的情况，设置该用户的代理红利的时候，要检查设置的的红利，不能大于上级的
+        if ($user['parent_id'] > 0) {
+            $parent_user = User::getOne(['id' => $user['parent_id']]);
+            if (empty($parent_user)) {
+                return Response::error([], ErrorCode::MLG_Error, '代理红利设置失败，该用户的上级代理不存在');
+            }
+            if ($agent_dividend > $parent_user['agent_dividend']) {
+                return Response::error([], ErrorCode::MLG_Error, '代理红利设置失败，不能大于直接上级的的红利，必须小于或等于上级的红利');
+            }
+        }
+        $edit_data = [];
         // 有传递密码则修改
         if (strlen($password)) {
             $edit_data['password'] = Tools::md5($password);

@@ -234,6 +234,19 @@ class AgentController extends Controller
         if ($check === false) {
             return Response::error([], ErrorCode::MLG_Error, "权限不足，请检查该用户是否是您的下级");
         }
+        if (empty($user)) {
+            return Response::error([], ErrorCode::MLG_Error, '用户不存在');
+        }
+        // 有上级用户的情况，设置该用户的代理红利的时候，要检查设置的的红利，不能大于上级的
+        if ($user['parent_id'] > 0) {
+            $parent_user = User::getOne(['id' => $user['parent_id']]);
+            if (empty($parent_user)) {
+                return Response::error([], ErrorCode::MLG_Error, '代理红利设置失败，该用户的上级代理不存在');
+            }
+            if ($agent_dividend > $parent_user['agent_dividend']) {
+                return Response::error([], ErrorCode::MLG_Error, '代理红利设置失败，不能大于直接上级的的红利，必须小于或等于上级的红利');
+            }
+        }
         $edit_data = [];
         if (strlen($password)) {
             $edit_data['password'] = Tools::md5($password);
