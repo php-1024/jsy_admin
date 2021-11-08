@@ -24,7 +24,9 @@ class FinanceController extends Controller
         $limit = $request->get('limit', 10);
         $info  = $request->get('info');
         $email = $request->get('email'); // 用户邮箱
-        $type  = $request->get('type'); // 1 USDT充值 2银行卡充值 3现货划转合约 4合约划转现货 5提现 6空投支出 7空投收入 8现货支出 9现货收入 10合约支出 11合约收入 12期权支出 13期权收入
+        $type  = $request->get('type'); // 1充值 2现货划转合约 3 合约划转现货 4 提现 5空投 6现货 7合约 8期权
+
+        // 1 USDT充值 2银行卡充值 3现货划转合约 4合约划转现货 5提现 6空投支出 7空投收入 8现货支出 9现货收入 10合约支出 11合约收入 12期权支出 13期权收入
         $where = [];
         if (strlen($email)) {
             $where['email'] = $email;
