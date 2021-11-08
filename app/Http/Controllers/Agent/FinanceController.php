@@ -29,12 +29,40 @@ class FinanceController extends Controller
         if (strlen($email)) {
             $where['email'] = $email;
         }
+        $ids   = User::where('user_path', 'like', "%{$info['sub_user_path']}%")->where(['user_level' => $info['user_level'] + 1])->pluck('id')->toArray();
+        $query = \App\Models\WalletStream::whereIn('user_id', $ids);
         if (strlen($type)) {
-            $where['type_detail'] = $type;
+            switch ($type) {
+                case "1":// 1充值
+                    $where['type_detail'] = $type;
+                    break;
+                case "2":// 2现货划转合约
+                    $where['type_detail'] = "3";
+                    break;
+                case "3":// 3 合约划转现货
+                    $where['type_detail'] = "4";
+                    break;
+                case "4":// 4 提现
+                    $where['type_detail'] = "5";
+                    break;
+                case "5":// 5空投
+                    $query = $query->whereIn('type_detail', ['6', '7']);
+                    break;
+                case "6":// 6现货
+                    $query = $query->whereIn('type_detail', ['8', '9']);
+                    break;
+                case "7":// 7合约
+                    $query = $query->whereIn('type_detail', ['10', '11']);
+                    break;
+                case "8":// 8期权
+                    $query = $query->whereIn('type_detail', ['12', '13']);
+                    break;
+                default:
+                    break;
+            }
+            $query = $query->where($where);
         }
-        $ids  = User::where('user_path', 'like', "%{$info['sub_user_path']}%")->where(['user_level' => $info['user_level'] + 1])->pluck('id')->toArray();
-        $list = \App\Models\WalletStream::whereIn('user_id', $ids)
-            ->where($where)
+        $list = $query->where($where)
             ->orderBy('id', 'desc')
             ->paginate($limit);
         return Response::success($list);
