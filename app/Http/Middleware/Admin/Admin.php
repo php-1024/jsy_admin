@@ -29,6 +29,7 @@ class Admin
             case 'api/admin/flush';
             case 'api/admin/upload_images';
             case 'api/admin/create_google_code';
+            case 'api/admin/currency/trading_pair/generate_wallet';
                 return $next($request);
                 break;
             default;

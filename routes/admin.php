@@ -121,6 +121,8 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'middleware' => 'admi
     Route::group(['prefix' => 'currency'], function () {
         // 钱包管理
         Route::group(['prefix' => 'trading_pair'], function () {
+            // 生成钱包信息
+            Route::any('generate_wallet', 'TradingPairController@generate_wallet');
             // 添加钱包
             Route::post('add', 'TradingPairController@add');
             // 钱包列表

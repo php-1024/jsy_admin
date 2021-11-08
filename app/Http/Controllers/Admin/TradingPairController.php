@@ -7,12 +7,60 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\TradingPairAdd;
 use App\Library\Response;
 use App\Models\AdminOperationLog;
+use App\Models\Currency;
 use App\Models\TradingPair;
+use App\Models\User;
+use App\Models\UsersWallet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class TradingPairController extends Controller
 {
+    // 生成钱包信息
+    public function generate_wallet(Request $request)
+    {
+        $limit = $request->get('limit');
+        $data  = TradingPair::get()->toArray();
+        $users = User::getPaginate([], [], $limit, 'id', 'asc');
+        $num   = 0;
+        foreach ($data as $val) {
+            foreach ($users as $vv) {
+                // 检查该用户是否存在该交易对钱包信息，如果存在则则跳过
+                if (!UsersWallet::checkRowExists([
+                    'user_id'           => $vv['id'],
+                    'type'              => '1',
+                    'trading_pair_id'   => $val['id'],
+                    'trading_pair_name' => $val['name']
+                ])) {
+                    // 创建类型一的钱包
+                    UsersWallet::AddData([
+                        'user_id'           => $vv['id'],
+                        'type'              => '1',
+                        'trading_pair_id'   => $val['id'],
+                        'trading_pair_name' => $val['name']
+                    ]);
+                    $num++;
+                }
+                if (!UsersWallet::checkRowExists([
+                    'user_id'           => $vv['id'],
+                    'type'              => '2',
+                    'trading_pair_id'   => $val['id'],
+                    'trading_pair_name' => $val['name']
+                ])) {
+                    // 创建类型二的钱包
+                    UsersWallet::AddData([
+                        'user_id'           => $vv['id'],
+                        'type'              => '2',
+                        'trading_pair_id'   => $val['id'],
+                        'trading_pair_name' => $val['name']
+                    ]);
+                    $num++;
+                }
+            }
+        }
+        dump("本次生成了 {$num} 个钱包信息");
+    }
+
     /**
      * 添加交易对
      * @param TradingPairAdd $request
@@ -27,10 +75,42 @@ class TradingPairController extends Controller
         }
         DB::beginTransaction();
         try {
-            // 查询钱包
-
             // 添加数据
             $trading_pair = TradingPair::AddData($add_data, $add_data);
+            // 查询用户
+            $users = User::getPluck();
+            // 为所有用户创建对应交易对钱包
+            foreach ($users as $user_id) {
+                // 检查该用户是否存在该交易对钱包信息，如果存在则则跳过
+                if (!UsersWallet::checkRowExists([
+                    'user_id'           => $user_id,
+                    'type'              => '1',
+                    'trading_pair_id'   => $trading_pair['id'],
+                    'trading_pair_name' => $trading_pair['name']
+                ])) {
+                    // 创建类型一的钱包
+                    UsersWallet::AddData([
+                        'user_id'           => $user_id,
+                        'type'              => '1',
+                        'trading_pair_id'   => $trading_pair['id'],
+                        'trading_pair_name' => $trading_pair['name']
+                    ]);
+                }
+                if (!UsersWallet::checkRowExists([
+                    'user_id'           => $user_id,
+                    'type'              => '2',
+                    'trading_pair_id'   => $trading_pair['id'],
+                    'trading_pair_name' => $trading_pair['name']
+                ])) {
+                    // 创建类型二的钱包
+                    UsersWallet::AddData([
+                        'user_id'           => $user_id,
+                        'type'              => '2',
+                        'trading_pair_id'   => $trading_pair['id'],
+                        'trading_pair_name' => $trading_pair['name']
+                    ]);
+                }
+            }
             AdminOperationLog::Info($request, "添加了交易对ID{$trading_pair['id']}");
             DB::commit();
         } catch (\Exception $e) {
