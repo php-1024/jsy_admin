@@ -248,6 +248,9 @@ class FinanceController extends Controller
             if ($val['status'] == 0) {
                 $list[$key]['clinch_num'] = "0.00";
             }
+            if ($val['status'] == 1) {
+                $list[$key]['clinch_num'] = 1;
+            }
         }
         return Response::success($list);
     }
